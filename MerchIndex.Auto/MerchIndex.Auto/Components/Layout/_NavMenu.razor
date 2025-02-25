@@ -35,9 +35,8 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <NavLink class="nav-link" aria-current="page" href="/"><i class="bi bi-house"></i> Hem</NavLink>
-                    @* <a class="nav-link active" aria-current="page" href="/">Home</a> *@
                 </li>
-                
+
                 <AuthorizeView>
                     <Authorized>
                         <li class="nav-item dropdown">
@@ -45,7 +44,7 @@
                                 Products
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="admin/products"><i class="bi bi-archive"></i> Products</a></li>
+                                <li><a class="dropdown-item" href="admin/products"><i class="bi bi-box"></i> Products</a></li>
                                 <li><a class="dropdown-item" href="admin/orders"><i class="bi bi-box2-heart"></i> Orders</a></li>
                                 @if (_currentUser.IsInRole(Constants.Role_Admins))
                                 {
@@ -55,6 +54,11 @@
                             </ul>
                         </li>
                     </Authorized>
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" aria-current="page" href="products"><i class="bi bi-box"></i> Products</NavLink>
+                        </li>
+                    </NotAuthorized>
                 </AuthorizeView>
 
                 <AuthorizeView Roles="@Constants.Role_Admins">
@@ -81,59 +85,9 @@
                                 <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
                             </NavLink>
                         </li>
-                        @*<li class="nav-item">
-                            <NavLink class="nav-link" href="Account/Manage">
-                                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
-                            </NavLink>
-                        </li> *@
 
                     </Authorized>
                 </AuthorizeView>
-
-                @* <AuthorizeView>
-                    <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="Account/Manage">
-                                <span class="bi bi-person" aria-hidden="true"></span> @context.User.Identity?.Name
-                            </NavLink>
-                        </li>
-
-                        <li class="nav-item">
-                            <form action="/Account/Logout" method="post">
-                                <AntiforgeryToken />
-                                <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
-                                <button type="submit" class="nav-link"><i class="bi bi-box-arrow-right"></i> Logga ut</button>
-                            </form>
-                        </li>
-                    </Authorized>
-
-                    <NotAuthorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="companyregister"><i class="bi bi-person-plus"></i> Registrera Företag</NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="account/Login"><i class="bi bi-box-arrow-in-right"></i> Logga in</NavLink>
-                        </li>
-                    </NotAuthorized>
-                </AuthorizeView> *@
-
-                @* <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                </li> *@
 
                 <li class="nav-item">
                     <NavLink class="nav-link" aria-current="page" href="contact"><i class="bi bi-send"></i> Kontakt</NavLink>
@@ -145,17 +99,11 @@
 
             <div class="d-flex" role="search" title="Sök">
                 <div class="form-floating">
-                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm">
+                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @onkeydown="handleKeyDown">
                     <label for="floatingInputSearch" class="form-label">Sök</label>
                 </div>
-                <button class="btn btn-warning text-light mx-1" style="width:60px;"><i class="bi bi-search"></i></button>
-                @* <input class="form-control ms-1" type="search" placeholder="Sök produkter" aria-label="Search">
-                <button class="btn btn-warning text-light" type="submit"><i class="bi bi-search"></i></button> *@
+                <button class="btn btn-warning text-light mx-1" style="width:60px;" @onclick="search"><i class="bi bi-search"></i></button>
             </div>
-            @* <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form> *@
 
             <AuthorizeView>
                 <Authorized>
@@ -165,10 +113,6 @@
                             <span class="bi bi-person" aria-hidden="true"></span> Välkommen @context.User.Identity?.Name
                         </a>
                     </div>
-
-                    @* <span class="navbar-text">
-                            <i class="bi bi-person"></i> Välkommen @context.User.Identity?.Name :)
-                        </span> *@
 
                     <div class="d-flex mx-1">
                         <form action="/Account/Logout" method="post">
@@ -187,7 +131,7 @@
                     </div>
                 </NotAuthorized>
             </AuthorizeView>
-            
+
         </div>
     </div>
 </nav>
@@ -210,19 +154,6 @@
         var url = new Uri(new Uri(_navigationManager.BaseUri), "/account/LogOut").ToString();
         var data = new Dictionary<string, string>();
         await PostPageAsync(url, data);
-
-        // var client = HttpClientFactory.CreateClient();
-        // client.BaseAddress = new Uri("https://localhost:7228/");
-        // var response = await client.PostAsync("Account/Logout", null);
-        // if (response.IsSuccessStatusCode)
-        // {
-        //     _navigationManager.NavigateTo("/", true);
-        // }
-        // else
-        // {
-        //     // Handle error response
-        //     Console.WriteLine("Logout failed: " + response.StatusCode);
-        // }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -253,5 +184,22 @@
             return response.StatusCode.ToString();
         }
     }
+
+    private void handleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            search();
+        }
+    }
+
+    private void search()
+    {
+        // if (!string.IsNullOrWhiteSpace(_searchTerm))
+        // {
+        _navigationManager.NavigateTo($"/products/{_searchTerm}");
+        // }
+    }
+
 }
 
