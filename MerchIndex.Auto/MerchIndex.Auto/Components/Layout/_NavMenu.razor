@@ -41,10 +41,10 @@
                     <Authorized>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Products
+                                Produkter
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="admin/products"><i class="bi bi-box"></i> Products</a></li>
+                                <li><a class="dropdown-item" href="admin/products"><i class="bi bi-box"></i> Produkter</a></li>
                                 <li><a class="dropdown-item" href="admin/orders"><i class="bi bi-box2-heart"></i> Orders</a></li>
                                 @if (_currentUser.IsInRole(Constants.Role_Admins))
                                 {
@@ -56,7 +56,7 @@
                     </Authorized>
                     <NotAuthorized>
                         <li class="nav-item">
-                            <NavLink class="nav-link" aria-current="page" href="products"><i class="bi bi-box"></i> Products</NavLink>
+                            <NavLink class="nav-link" aria-current="page" href="products"><i class="bi bi-box"></i> Produkter</NavLink>
                         </li>
                     </NotAuthorized>
                 </AuthorizeView>
