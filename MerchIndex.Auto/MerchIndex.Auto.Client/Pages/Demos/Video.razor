@@ -1,0 +1,52 @@
+﻿@page "/video"
+
+@* @attribute [Authorize] *@
+@rendermode InteractiveWebAssembly
+@attribute [StreamRendering]
+
+@* https://www.codeguru.co.in/2022/06/how-to-access-deviceweb-camera-with.html *@
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    @_errorMessage
+}
+
+<video id="video" @ref="_video" class="w-100 p-3"></video>
+
+
+@code {
+    private string _title = "Video";
+
+    private ElementReference _video { get; set; }
+    private string _errorMessage = "";
+    private string _jsModulePath = "./js/video.js";
+    private Task<IJSObjectReference>? _moduleRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _moduleRef = _js.InvokeAsync<IJSObjectReference>("import", _jsModulePath).AsTask();
+            var module = await _moduleRef;
+            await module.InvokeVoidAsync("init", _video, DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public void OnSuccess()
+    {
+        StateHasChanged();
+
+    }
+    [JSInvokable]
+    public void onFailure(string e)
+    {
+        _errorMessage = e;
+        StateHasChanged();
+    }
+
+
+}   

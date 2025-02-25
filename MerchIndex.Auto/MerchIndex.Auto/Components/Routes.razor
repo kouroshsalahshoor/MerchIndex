@@ -1,0 +1,18 @@
+﻿<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                <RedirectToLogin />
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    @* <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p class="text-danger text-center">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound> *@
+</Router>
+
+@code {
+}

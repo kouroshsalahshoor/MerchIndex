@@ -1,0 +1,371 @@
+﻿@page "/CompanyRegister"
+@rendermode InteractiveServer
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using MerchIndex.Auto.Components.Account
+@using MerchIndex.Auto.Components.Account.Shared
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using MerchIndex.Auto.Client.Utilities
+@using MerchIndex.Auto.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject ILogger<Register> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+@inject RoleManager<IdentityRole> RoleManager
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<div class="my-3">
+    <EditForm Model="Input" method="post" OnValidSubmit="submit" FormName="register" class="row g-3">
+        <div class="row">
+            <DataAnnotationsValidator />
+            @if (_errors.Any())
+            {
+                <ul class="text-danger">
+                    @foreach (var error in _errors)
+                    {
+                        <li>@error</li>
+                    }
+                </ul>
+            }
+            <StatusMessage Message="@Message" />
+            <ValidationSummary class="text-danger" role="alert" />
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.CompanyName" class="form-control" id="Input.CompanyName" placeholder="" />
+                <label for="Input.CompanyName">FöretagsNamn</label>
+                <ValidationMessage For="() => Input.CompanyName" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.BusinessArea" class="form-control" id="Input.BusinessArea" placeholder="" />
+                <label for="Input.BusinessArea">Business område</label>
+                <ValidationMessage For="() => Input.BusinessArea" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.Email" class="form-control" id="Input.Email" placeholder="" />
+                <label for="Input.Email">Email</label>
+                <ValidationMessage For="() => Input.Email" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.PhoneNumber" class="form-control" id="Input.PhoneNumber" placeholder="" />
+                <label for="Input.PhoneNumber">Telefon</label>
+                <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.Password" class="form-control" id="Input.Password" placeholder="" />
+                <label for="Input.Password">Password</label>
+                <ValidationMessage For="() => Input.Password" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.ConfirmPassword" class="form-control" id="Input.ConfirmPassword" placeholder="" />
+                <label for="Input.ConfirmPassword">Bekräfta Password</label>
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.Address" class="form-control" id="Input.Address" placeholder="" />
+                <label for="Input.Address">Adress</label>
+                <ValidationMessage For="() => Input.Address" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.District" class="form-control" id="Input.District" placeholder="" />
+                <label for="Input.District">Stadsdel</label>
+                <ValidationMessage For="() => Input.District" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.City" class="form-control" id="Input.City" placeholder="" />
+                <label for="Input.City">Stad</label>
+                <ValidationMessage For="() => Input.City" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-12">
+            <div class="form-group">
+                <label>Företagets Logo</label>
+                <InputFile id="Image" OnChange="setUploadingFiles" accept="image/*" class="form-control" />
+                @* <label for="Image">Upload Image</label> *@
+
+                <div class="row mt-2">
+                    @foreach (var imageString in _imageStrings!)
+                    {
+                        <img src="@imageString" alt="" class="img-thumbnail" style="width:100%" />
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary w-100">Spara</button>
+        </div>
+    </EditForm>
+</div> 
+
+@if (_loading)
+{
+    <_Loader />
+}
+@code {
+    private ApplicationDbContext _db => Service;
+    private string _title = "Registrera Företag";
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    private IEnumerable<IdentityError>? identityErrors;
+    private List<string> _errors = new();
+    private bool _loading;
+
+    private string _parentDirName = "Companies";
+    private List<string> _imageStrings = new();
+    private List<IBrowserFile>? _uploadingFiles = new();
+    private List<FileInfo>? _fileInfos = new();
+
+    public async Task submit(EditContext editContext)
+    {
+        _loading = true;
+        StateHasChanged();
+
+        if (await _db.Companies.AnyAsync(x => x.Name == Input.CompanyName))
+        {
+            _errors.Add(Constants.SameNameText);
+            return;
+        }
+
+        // https://learn.microsoft.com/en-us/ef/core/saving/transactions
+        using var transaction = await _db.Database.BeginTransactionAsync();
+
+        _errors.Clear();
+        ReturnUrl = ReturnUrl ?? "/account/login";
+
+        try
+        {
+            var user = CreateUser();
+
+            await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+            // await UserStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
+            var emailStore = GetEmailStore();
+            await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+            var result = await UserManager.CreateAsync(user, Input.Password);
+
+            if (!result.Succeeded)
+            {
+                identityErrors = result.Errors;
+                _errors.AddRange(result.Errors.Select(x => x.Description));
+
+                _loading = false;
+                StateHasChanged();
+
+                return;
+            }
+            Logger.LogInformation("User created a new account with password.");
+
+            if (await RoleManager.Roles.AnyAsync(x => x.Name == Constants.Role_CompanyAdmins) == false)
+            {
+                await RoleManager.CreateAsync(new IdentityRole(Constants.Role_Users));
+                await RoleManager.CreateAsync(new IdentityRole(Constants.Role_CompanyAdmins));
+                await RoleManager.CreateAsync(new IdentityRole(Constants.Role_Admins));
+            }
+
+            result = await UserManager.AddToRoleAsync(user, Constants.Role_CompanyAdmins);
+            if (!result.Succeeded)
+            {
+                identityErrors = result.Errors;
+                _errors.AddRange(result.Errors.Select(x => x.Description));
+
+                _loading = false;
+                StateHasChanged();
+
+                return;
+            }
+            Logger.LogInformation("User added to role.");
+
+            var userId = await UserManager.GetUserIdAsync(user);
+
+            var company = new Company
+                {
+                    Name = Input.CompanyName,
+                    BusinessArea = Input.BusinessArea,
+                    Email = Input.Email,
+                    Tel = Input.PhoneNumber,
+                    Address = Input.Address,
+                    District = Input.District,
+                    City = Input.City,
+                    AdminId = userId
+                };
+
+            await _db.Companies.AddAsync(company);
+            await _db.SaveChangesAsync();
+            Logger.LogInformation("Company created.");
+
+            // Commit transaction if all commands succeed, transaction will auto-rollback
+            // when disposed if either commands fails
+            await transaction.CommitAsync();
+
+            if (_uploadingFiles is not null && _uploadingFiles!.Any())
+            {
+                _imageService.DeleteAll(_parentDirName, company.Id.ToString());
+                await _imageService.UploadFiles(_parentDirName, company.Id.ToString(), _uploadingFiles!);
+            }
+
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+                new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+
+            await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+            if (UserManager.Options.SignIn.RequireConfirmedAccount)
+            {
+                RedirectManager.RedirectTo(
+                    "Account/RegisterConfirmation",
+                    new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+            }
+
+            // await SignInManager.SignInAsync(user, isPersistent: false);
+
+            // await _js.ToastrSuccess("Registered successfully");
+            // await Task.Delay(500);
+
+            _navigationManager.NavigateTo("companyregistersuccess");
+            // _navigationManager.NavigateTo(ReturnUrl);
+            // RedirectManager.RedirectTo(ReturnUrl);
+        }
+        catch (Exception e)
+        {
+            _errors.Add("Error: Company Registeration failed!");
+            _errors.Add(e.Message);
+
+            await _js.ToastrError("Error: Company Registeration failed!");
+        }
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
+    private async Task setUploadingFiles(InputFileChangeEventArgs e)
+    {
+        _uploadingFiles = e.GetMultipleFiles().ToList();
+
+        await setImageStrings(_uploadingFiles);
+    }
+
+    private async Task setImageStrings(List<IBrowserFile> browserFiles)
+    {
+        _imageStrings.Clear();
+        foreach (var file in browserFiles)
+        {
+            _imageStrings.Add(await _imageService.ToBase64(file));
+        }
+    }
+
+    private sealed class InputModel
+    {
+        // [Required]
+        // [Display(Name = "User Name")]
+        // public string UserName { get; set; } = "";
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
+
+        [Required]
+        // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Company Name")]
+        public string CompanyName { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "Business Area")]
+        public string BusinessArea { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "Address")]
+        public string Address { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "District")]
+        public string District { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "City")]
+        public string City { get; set; } = string.Empty;
+    }
+}

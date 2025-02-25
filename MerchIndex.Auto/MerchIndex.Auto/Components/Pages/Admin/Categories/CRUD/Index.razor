@@ -1,0 +1,101 @@
+﻿@page "/admin/categories"
+@* @implements IAsyncDisposable *@
+
+@* @attribute [Authorize] *@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<p class="container">
+    <div class="input-group mb-3">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="search" placeholder="" @bind="_filter" @bind:event="oninput">
+            <label for="search">Search</label>
+        </div>
+        <span class="input-group-text bg-warning text-light px-3"><i class="bi bi-search"></i></span>
+    </div>
+</p>
+
+@* <QuickGrid Class="table table-striped table-hover" Items="_db.Categories" Pagination="_pagination"> *@
+<QuickGrid Class="table table-striped table-hover" Items="_filteredItems" Pagination="_pagination">
+    <PropertyColumn Property="x => x.Name" Sortable="true" />
+
+    <TemplateColumn Context="item" Class="text-center zero_width">
+        <HeaderTemplate><a class="btn btn-sm btn-primary mx-auto" href="admin/category/create" title="Create"><i class="bi bi-plus-square"></i></a></HeaderTemplate>
+        <ChildContent>
+            <a class="btn btn-sm btn-warning" href="@($"admin/category/update/{item.Id}")" title="Update"><i class="bi bi-pencil-square"></i></a>
+            <a class="btn btn-sm btn-info" href="@($"admin/category/{item.Id}")" title="Details"><i class="bi bi-info-square"></i></a>
+            <button class="btn btn-sm btn-danger" @onclick="@(async() => await delete(item))" title="Delete"><i class="bi bi-trash"></i></button>
+        </ChildContent>
+    </TemplateColumn>
+    <TemplateColumn Context="item" Class="text-center zero_width">
+        <HeaderTemplate><button class="btn btn-sm btn-primary mx-auto" @onclick="@(async() => await _createUpdateModal.Show())" title="Create Modal"><i class="bi bi-plus-square"></i></button></HeaderTemplate>
+        <ChildContent>
+            <button class="btn btn-sm btn-primary" @onclick="@(async() => await _IndexModal.Show())" title="List Modal"><i class="bi bi-list"></i></button>
+            <button class="btn btn-sm btn-warning" @onclick="@(async() => await _createUpdateModal.Show(item))" title="Update Modal"><i class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-sm btn-info" @onclick="@(async() => await _DetailsModal.Show(item))" title="Details Modal"><i class="bi bi-info-square"></i></button>
+            @* <button class="btn btn-sm btn-danger" title="Delete Modal"><i class="bi bi-trash"></i></button> *@
+        </ChildContent>
+    </TemplateColumn>
+</QuickGrid>
+<Paginator State="_pagination" />
+
+<MerchIndex.Auto.Components.Pages.Admin.Categories.CRUD.Modal._Index @ref="_IndexModal" OnClose="indexModalClosed" />
+<MerchIndex.Auto.Components.Pages.Admin.Categories.CRUD.Modal._Details @ref="_DetailsModal" />
+<MerchIndex.Auto.Components.Pages.Admin.Categories.CRUD.Modal._CreateUpdate OnClose="createUpdateModalClosed" @ref="_createUpdateModal" />
+
+@code {
+    private ApplicationDbContext _db => Service;
+    // private ApplicationDbContext _db = default!;
+    private string _title = "Categories";
+
+    private string _filter = string.Empty;
+    private IQueryable<Category> _filteredItems = default!;
+    // private IQueryable<Category> _filteredItems => _db.Categories.Where(m => m.Name!.Contains(_filter)).OrderByDescending(x => x.Id);
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 2 };
+
+    private MerchIndex.Auto.Components.Pages.Admin.Categories.CRUD.Modal._Index _IndexModal = default!;
+    private MerchIndex.Auto.Components.Pages.Admin.Categories.CRUD.Modal._Details _DetailsModal = default!;
+    private MerchIndex.Auto.Components.Pages.Admin.Categories.CRUD.Modal._CreateUpdate _createUpdateModal = default!;
+
+    protected override async void OnInitialized()
+    {
+        await load();
+    }
+
+    private async Task load()
+    {
+        _filteredItems = _db.Categories.Where(m => m.Name!.Contains(_filter)).OrderByDescending(x => x.Id);
+    }
+
+    private async ValueTask delete(Category model)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            if (model is not null)
+            {
+                // using var db = _dbFactory.CreateDbContext();
+                _db.Categories.Remove(model);
+                await _db.SaveChangesAsync();
+
+                // await _js.ToastrSuccess("Deleted successfully");
+
+                await load();
+            }
+        }
+    }
+
+    private async Task indexModalClosed()
+    {
+        await load();
+    }
+    private async Task createUpdateModalClosed()
+    {
+        await load();
+    }
+
+    // public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+}

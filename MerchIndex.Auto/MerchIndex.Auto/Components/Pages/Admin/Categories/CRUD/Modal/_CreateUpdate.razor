@@ -1,0 +1,128 @@
+﻿@if (_show)
+{
+    <div class="modal fade show" id="staticBackdropLive" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLiveLabel" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <EditForm method="post" Model="_model" OnValidSubmit="submit" FormName="create" Enhance>
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLiveLabel">@_title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="close" title="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary class="text-danger" role="alert" />
+
+                                @if (_errors.Any())
+                                {
+                                    <ul class="text-danger">
+                                        @foreach (var error in _errors)
+                                        {
+                                            <li>@error</li>
+                                        }
+                                    </ul>
+                                }
+
+                                <div class="form-floating mb-3">
+                                    <InputText id="name" @bind-Value="_model.Name" class="form-control" placeholder="" />
+                                    <label for="name">Name</label>
+                                    <ValidationMessage For="() => _model.Name" class="text-danger" />
+                                </div>
+
+                                @* <button type="submit" class="btn btn-primary">Save</button>
+                                <a class="btn btn-light" href="/categories">Back to List</a> *@
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" @onclick="close" title="Close">Close</button>
+                        <button type="submit" class="btn btn-primary" title="Save">Save</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private bool _show { get; set; } = false;
+    private string _title = "Details";
+    private List<string> _errors = new();
+
+    [SupplyParameterFromForm]
+    private Category _model { get; set; } = new();
+
+    public async Task Show(Category? model = null)
+    {
+        _title = model is null ? "Create" : "Update";
+
+        _model = model ?? new();
+
+        _show = true;
+        StateHasChanged();
+    }
+
+    private async Task close()
+    {
+        _show = false;
+        StateHasChanged();
+
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task submit()
+    {
+        _errors.Clear();
+
+        using var db = _dbFactory.CreateDbContext();
+
+        if (await db.Categories.AnyAsync(x => x.Name == _model!.Name && x.Id != _model.Id))
+        {
+            _errors.Add("Another item with same name already exists");
+            return;
+        }
+
+        if (_model.Id == 0)
+        {
+            db.Categories.Add(_model!);
+        }
+        else
+        {
+            db.Attach(_model!).State = EntityState.Modified;
+        }
+
+        try
+        {
+            await db.SaveChangesAsync();
+            
+            _show = false;
+            StateHasChanged();
+
+            await OnClose.InvokeAsync();
+        }
+        catch (DbUpdateConcurrencyException e)
+        {
+            if (!CategoryExists(_model!.Id))
+            {
+                _navigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                _errors.Add(e.Message);
+                // throw;
+            }
+        }
+
+    }
+
+    private bool CategoryExists(int id)
+    {
+        using var db = _dbFactory.CreateDbContext();
+        return db.Categories.Any(e => e.Id == id);
+    }
+}

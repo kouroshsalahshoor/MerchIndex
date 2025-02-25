@@ -1,0 +1,91 @@
+﻿@page "/cart"
+@implements IDisposable
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Quantity</th>
+            <th>Item</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Subtotal</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var line in _cartService?.Lines ?? Enumerable.Empty<CartLine>())
+        {
+            <tr>
+                <td class="text-center">@line.Quantity</td>
+                <td class="text-left">@line.Product.Name</td>
+                <td class="text-right">@line.Product.Price.ToString("c")</td>
+                <td class="text-right">
+                    @((line.Quantity * line.Product.Price).ToString("c"))
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-danger" @onclick="@(async ()=> await remove(line.Product))">
+                        Remove
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="text-right">Total:</td>
+            <td class="text-right">
+                @_cartService?.ComputeTotalValue().ToString("c")
+            </td>
+        </tr>
+    </tfoot>
+</table>
+<div class="text-center">
+    <a class="btn btn-primary" href="@_returnUrl">Continue shopping</a>
+    @if (_cartService!.Lines.Any())
+    {
+        <a class="btn btn-primary mx-1" href="checkout">
+            Checkout
+        </a>
+    }
+    else
+    {
+        <p class="text-danger">Your cart is empty</p>
+    }
+</div>
+
+@code {
+    private string _title = "Cart";
+    // private bool _connected = false;
+
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string _returnUrl { get; set; } = "/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _returnUrl = _returnUrl ?? "products";
+        _cartService.OnChange += StateHasChanged;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // _connected = true;
+            await _cartService.Load();
+            StateHasChanged();
+        }
+    }
+
+    private async Task remove(Product product)
+    {
+        await _cartService.RemoveLine(product);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _cartService.OnChange -= StateHasChanged;
+    }
+}

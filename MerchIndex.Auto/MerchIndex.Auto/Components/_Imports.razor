@@ -1,0 +1,51 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using MerchIndex.Auto
+@using MerchIndex.Auto.Client
+@using MerchIndex.Auto.Client.Services
+@using MerchIndex.Auto.Components
+
+@using MerchIndex.Auto.Client.Models
+@using MerchIndex.Auto.Data
+@using MerchIndex.Auto.Repository
+@using MerchIndex.Auto.Components.Pages.Cart
+@using MerchIndex.Auto.Repository.IRepository
+@using MerchIndex.Auto.Services
+@using MerchIndex.Auto.Client.Utilities
+@using MerchIndex.Auto.Components.Layout
+@using MerchIndex.Auto.Components.Shared
+
+@using MerchIndex.Auto.Components.Pages.Products
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage _protectedLocalStorage
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inherits OwningComponentBase<ApplicationDbContext>
+@inject IJSRuntime _js
+@inject NavigationManager _navigationManager
+@inject UserManager<ApplicationUser> _userManager
+@inject RoleManager<IdentityRole> _roleManager
+@inject IDbContextFactory<ApplicationDbContext> _dbFactory
+@inject AuthenticationStateProvider _authenticationStateProvider
+@inject IWebHostEnvironment _env
+
+@inject IStoreRepository _efStoreRepository
+@inject IOrderRepository _orderRepository
+@inject CartService _cartService
+@inject EmailService _emailService
+
+@inject ImageService _imageService

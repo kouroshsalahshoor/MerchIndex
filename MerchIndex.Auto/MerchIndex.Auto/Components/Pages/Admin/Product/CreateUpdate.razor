@@ -1,0 +1,194 @@
+﻿@page "/admin/product/update/{id:long}"
+@page "/admin/product/create"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@inject IWebHostEnvironment _env
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<EditForm Model="_model" OnValidSubmit="submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    @if (_model.Id != 0)
+    {
+        <div class="form-floating py-1">
+            <InputNumber class="form-control" @bind-Value="_model.Id" id="Id" placeholder="" disabled />
+            <label for="Id">Id</label>
+        </div>
+    }
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Name" id="Name" placeholder="" />
+        <label for="Name">Name</label>
+        <ValidationMessage For="@(() => _model.Name)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Description" id="Description" placeholder="" />
+        <label for="Description">Description</label>
+        <ValidationMessage For="@(() => _model.Description)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Category" id="Category" placeholder="" />
+        <label for="Category">Category</label>
+        <ValidationMessage For="@(() => _model.Category)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputNumber class="form-control" @bind-Value="_model.Price" id="Price" placeholder="" />
+        <label for="Price">Price</label>
+        <ValidationMessage For="@(() => _model.Price)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Tag" id="Tag" placeholder="" />
+        <label for="Tag">Tag</label>
+        <ValidationMessage For="@(() => _model.Tag)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputFile class="form-control" id="Image" OnChange="loadFiles" multiple accept="image/*" />
+        <label for="Image">Upload Image</label>
+        @* <ValidationMessage For="@(() => _model.Image)" /> *@
+
+        @if (_fileInfos!.Any())
+        {
+            <div class="row mt-2">
+                @foreach (var fileInfo in _fileInfos!)
+                {
+                    <div class="col-md-2">
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <a class="btn btn-danger btn-sm" @onclick="@(async() => await deleteImage(fileInfo))" title="Delete"><i class="bi bi-trash"></i> Delete</a>
+                            </div>
+                            <div class="col-md-12">
+                                <img src="@($"/images/products/{_model.Id}/{fileInfo.Name}")" alt="@_model.Name" class="img-thumbnail" style="width:100%" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <div class="mt-1">
+        <button type="submit" class="btn btn-@(Id == 0 ? "primary" : "warning")" title="Save"><i class="bi bi-floppy"></i> Save</button>
+        <NavLink class="btn btn-light" href="/admin/products" title="Back to List"><i class="bi bi-list"></i>Back to List</NavLink>
+    </div>
+</EditForm>
+
+@code {
+    private ApplicationDbContext _db => Service;
+    [Parameter] public long Id { get; set; } = 0;
+
+    private string _title = "Products";
+    private Product _model { get; set; } = new();
+
+    private bool _loading;
+    private string _dirName = "Companies"; 
+    // private string _dir = string.Empty;
+    private IReadOnlyList<IBrowserFile>? _uploadingFiles;
+    private List<FileInfo>? _fileInfos = new();
+
+    // protected override Task OnInitializedAsync()
+    // {
+    //     // _dirName = Path.Combine(_env.WebRootPath, "images", "products");
+    //     // _dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+    //     // if (Directory.Exists(_dir) == false)
+    //     // {
+    //     //     Directory.CreateDirectory(_dir);
+    //     // }
+
+    //     return base.OnInitializedAsync();
+    // }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _title = Id == 0 ? "Create" : "Update";
+        if (Id != 0)
+        {
+            _model = _db.Products.FirstOrDefault(p => p.Id == Id) ?? new();
+            _imageService.GetFileInfos(_dirName, Id.ToString());
+        }
+    }
+
+    private async Task submit()
+    {
+        if (Id == 0)
+        {
+            _db.Products.Add(_model);
+        }
+        else
+        {
+            _db.Products.Update(_model);
+        }
+
+        await _db.SaveChangesAsync();
+
+        if (_uploadingFiles is not null && _uploadingFiles!.Any())
+        {
+            await uploadFiles();
+        }
+
+        _navigationManager?.NavigateTo("/admin/products");
+    }
+
+    private void loadFiles(InputFileChangeEventArgs e)
+    {
+        _uploadingFiles = e.GetMultipleFiles();
+    }
+
+    private async Task uploadFiles()
+    {
+        // _loading = true;
+        // StateHasChanged();
+
+        // var dir = _imageService.GetUrl(_dirName, _model.Id.ToString()!);
+        // // var productDir = Path.Combine(_dir, _model.Id.ToString()!);
+        // // if (Directory.Exists(productDir) == false)
+        // // {
+        // //     Directory.CreateDirectory(productDir);
+        // // }
+
+        // foreach (var file in _uploadingFiles!)
+        // {
+        //     var fileInfo = new FileInfo(file.Name);
+
+        //     var newFileName = $"{Guid.NewGuid()}{fileInfo.Extension}";
+        //     var newFilePath = Path.Combine(productDir, newFileName);
+
+        //     await using var fs = new FileStream(newFilePath, FileMode.Create);
+        //     await file.OpenReadStream(file.Size).CopyToAsync(fs);
+
+        // }
+        // _loading = false;
+        // StateHasChanged();
+    }
+
+    // private async Task getAllImagesInDir()
+    // {
+    //     if (_model.Id > 0)
+    //     {
+    //         var productDir = Path.Combine(_dir, _model.Id.ToString()!);
+    //         if (Directory.Exists(productDir))
+    //         {
+    //             var files = Directory.GetFiles(productDir);
+    //             foreach (var file in files)
+    //             {
+    //                 _productFileInfos?.Add(new FileInfo(file));
+    //             }
+    //         }
+    //     }
+    // }
+
+    private async Task deleteImage(FileInfo fileInfo)
+    {
+        // if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        // {
+        //     // $"/images/products/{_model.Id}/{fileInfo.Name}
+        //     var filePath = Path.Combine(_dir, _model.Id.ToString()!, fileInfo.Name);
+        //     if (File.Exists(filePath))
+        //     {
+        //         File.Delete(filePath);
+        //         _productFileInfos?.Remove(fileInfo);
+        //     }
+        // }
+    }
+}

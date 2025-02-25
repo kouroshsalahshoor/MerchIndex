@@ -1,0 +1,101 @@
+﻿@page "/person/create"
+@page "/person/update/{id:long}"
+@implements IDisposable
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+<h4 class="bg-@_theme text-center text-white p-2">@_title</h4>
+
+<EditForm Model="_model" OnValidSubmit="submit">
+    <DataAnnotationsValidator />
+    @if (_title == "Update")
+    {
+        <div class="form-group">
+            <label>ID</label>
+            <InputNumber class="form-control" @bind-Value="_model.Id" readonly />
+        </div>
+    }
+    <div class="form-group">
+        <label>Firstname</label>
+        <ValidationMessage For="@(() => _model.Firstname)" />
+        <InputText class="form-control" @bind-Value="_model.Firstname" />
+    </div>
+    <div class="form-group">
+        <label>Surname</label>
+        <ValidationMessage For="@(() => _model.Surname)" />
+        <InputText class="form-control" @bind-Value="_model.Surname" />
+    </div>
+    <div class="form-group">
+        <label>Deptartment</label>
+        <ValidationMessage For="@(() => _model.DepartmentId)" />
+        <InputSelect id="country" @bind-Value="_model.DepartmentId" class="form-select">
+            <option selected disabled value="0">Please Choose a Department</option>
+            @foreach (var item in _departments)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Location</label>
+        <ValidationMessage For="@(() => _model.LocationId)" />
+        <InputSelect id="country" @bind-Value="_model.LocationId" class="form-select">
+            <option selected disabled value="0">Please Choose a Location</option>
+            @foreach (var item in _locations)
+            {
+                <option value="@item.Id">@item.State @item.City</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="text-center">
+        @* <ValidButton type="submit" BtnTheme="@_theme">Save</ValidButton> *@
+        <button type="submit" class="btn btn-@_theme mt-2">Save</button>
+        <NavLink class="btn btn-light mt-2" href="/people">Back</NavLink>
+    </div>
+</EditForm>
+
+@code {
+
+    private ApplicationDbContext? _db => Service;
+    [Parameter] public long Id { get; set; }
+
+    private Person _model { get; set; } = new();
+    private string _title => Id == 0 ? "Create" : "Update";
+    private string _theme => Id == 0 ? "primary" : "warning";
+    private List<Department> _departments { get; set; } = new();
+    private List<Location> _locations { get; set; } = new();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        if (_db != null)
+        {
+            if (_title == "Update")
+            {
+                _model = await _db.People.FindAsync(Id) ?? new Person();
+            }
+            _departments = await _db.Departments.ToListAsync();
+            _locations = await _db.Locations.ToListAsync();
+        }
+    }
+
+    public async Task submit()
+    {
+        if (_db != null)
+        {
+            if (_title == "Create")
+            {
+                _db.Add(_model);
+            }
+            await _db.SaveChangesAsync();
+            _navigationManager?.NavigateTo("/people");
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_db != null)
+        {
+            _db.Entry(_model).State = EntityState.Detached;
+        }
+    }
+}

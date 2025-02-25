@@ -1,0 +1,27 @@
+﻿@page "/xproducts/qg"
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>Product QG</PageTitle>
+<h3>Product QG</h3>
+
+<QuickGrid Items="@_items" Pagination="@_pagination" Class="table table-sm table-striped table-hover">
+    <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.Price)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.Description)" Sortable="true" />
+</QuickGrid>
+
+<Paginator State="@_pagination" />
+
+@code {
+    ApplicationDbContext? _db => Service;
+
+    private IQueryable<Product>? _items;
+    PaginationState _pagination = new PaginationState { ItemsPerPage = 3 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _items = _db!.Products.AsQueryable();
+    }
+}
+ 

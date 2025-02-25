@@ -1,0 +1,32 @@
+﻿@page "/admin/company/{id:long}"
+@attribute [Authorize]
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<table class="table table-sm table-bordered table-striped">
+    <tbody>
+        <tr><th>ID</th><td>@_model.Id</td></tr>
+        <tr><th>Name</th><td>@_model.Name</td></tr>
+        <tr><th>Description</th><td>@_model.Email</td></tr>
+        <tr><th>Category</th><td>@_model.BusinessArea</td></tr>
+        <tr><th>Price</th><td>@_model.District</td></tr>
+        <tr><th>City</th><td>@_model.City</td></tr>
+        <tr><th>Is Active</th><td>@_model.IsActive</td></tr>
+        <tr><th>Image</th><td><img src="@_imageService.GetUrl("Companies", _model.Id.ToString())" width="100"/> </td></tr>
+    </tbody>
+</table>
+<NavLink class="btn btn-warning" href="@($"/admin/company/update/{_model?.Id}")" title="Update"><i class="bi bi-pencil-square"></i> Update</NavLink>
+<NavLink class="btn btn-light" href="/admin/companies" title="Back to List"><i class="bi bi-list"></i> Back to List</NavLink>
+
+@code {
+    private ApplicationDbContext _db => Service;
+    [Parameter] public long Id { get; set; }
+
+    private string _title = "Details";
+    private Company _model { get; set; } = new();
+    protected override void OnParametersSet()
+    {
+        _model = _db.Companies.FirstOrDefault(p => p.Id == Id)!;
+    }
+}

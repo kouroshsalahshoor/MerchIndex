@@ -1,0 +1,16 @@
+﻿@page "/completed/{orderId:int}"
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<div class="text-center">
+    <h2>Thanks!</h2>
+    <p>Thanks for placing order #@OrderId</p>
+    <p>We'll ship your goods as soon as possible.</p>
+    <a class="btn btn-primary" href="/">Return to Store</a>
+</div>
+
+@code {
+    [Parameter] public int OrderId { get; set; }
+    private string _title = "Completed";
+}

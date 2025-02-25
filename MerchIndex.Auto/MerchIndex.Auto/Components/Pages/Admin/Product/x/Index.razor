@@ -1,0 +1,101 @@
+﻿@page "/xxxadmin/products"
+@page "/admin"
+@rendermode InteractiveServer
+@* @attribute [Authorize] *@
+
+@inject IWebHostEnvironment _env
+
+<PageTitle>@_title</PageTitle>
+
+
+<!-- Shopping Summery -->
+<table class="table shopping-summery text-center">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th class="text-center">Image</th>
+            <td class="text-center">
+                <a class="btn min" href="/admin/product/create" title="Create"><i class="ti-plus"></i></a>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_items.Any())
+        {
+            @foreach (var item in _items)
+            {
+                <tr>
+                    <td class="product-id" data-title="Id"><span>@item.Id</span></td>
+                    <td class="product-name" data-title="Name"><span>@item.Name</span></td>
+                    <td class="" data-title="Category"><span>@item.Category</span></td>
+                    <td class="price" data-title="Price"><span>@item.Price.ToString("c")</span></td>
+                    <td class="image text-center" data-title="Image"><img src="@getImageUrl(item.Id)" alt="@item.Name"></td>
+                    <td class="action zero_width" data-title="Action">
+                        <a class="btn min info" href="@($"/admin/product/{item.Id}")" title="Details"><i class="ti-info"></i></a>
+                        <a class="btn min warning" href="@($"/admin/product/update/{item.Id}")" title="Update"><i class="ti-pencil"></i></a>
+                        <a class="btn min danger" @onclick="@(e => delete(item))" title="Delete"><i class="ti-trash"></i></a>
+                        <a class="btn min" @onclick="@(() => _captureImageModal.Show())" title="Capture"><i class="ti-camera"></i></a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No Products</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+<!--/ End Shopping Summery -->
+
+<_CaptureImage @ref="_captureImageModal" />
+
+@code {
+    private ApplicationDbContext _db => Service;
+
+    private string _title = "Products";
+    private IEnumerable<Product> _items { get; set; } = Enumerable.Empty<Product>();
+
+    private string _dir = string.Empty;
+
+    private _CaptureImage _captureImageModal = null!;
+
+    protected async override Task OnInitializedAsync()
+    {
+        _dir = Path.Combine(_env.WebRootPath, "images", "products");
+        await load();
+    }
+    private async Task load()
+    {
+        _items = await _db.Products.ToListAsync();
+    }
+    private async Task delete(Product p)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            _db.Products.Remove(p);
+            await _db.SaveChangesAsync();
+            await load();
+        }
+    }
+
+    private string? getImageUrl(long? id)
+    {
+        var productDir = Path.Combine(_dir, id.ToString()!);
+        if (Directory.Exists(productDir))
+        {
+            var files = Directory.GetFiles(productDir);
+            if (files is not null && files.FirstOrDefault() is not null)
+            {
+                var fileName = new FileInfo(files.FirstOrDefault()!).Name;
+                return $"images/products/{id.ToString()}/{fileName}";
+            }
+        }
+        return $"images/default.png";
+    }
+}

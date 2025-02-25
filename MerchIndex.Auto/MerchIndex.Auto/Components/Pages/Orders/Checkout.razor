@@ -1,0 +1,94 @@
+﻿@page "/checkout"
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+@if (_cartService.Lines.Any() == false)
+{
+    <p class="text-danger">Sorry, your cart is empty!</p>
+}
+else
+{
+    @* <h2>Check out now</h2> *@
+    <p>Please enter your details, and we'll ship your goods right away!</p>
+    <EditForm Model="_model" OnValidSubmit="submit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+        <h3>Ship to</h3>
+        <div class="form-group">
+            <label>Name:</label>
+            <InputText class="form-control" @bind-Value="_model.Name" />
+            <ValidationMessage For="@(() => _model.Name)" />
+        </div>
+        <h3>Address</h3>
+        <div class="form-group">
+            <label>Line1:</label>
+            <InputText class="form-control" @bind-Value="_model.Line1" />
+            <ValidationMessage For="@(() => _model.Line1)" />
+        </div>
+        <div class="form-group">
+            <label>Line2:</label>
+            <InputText class="form-control" @bind-Value="_model.Line2" />
+            <ValidationMessage For="@(() => _model.Line2)" />
+        </div>
+        <div class="form-group">
+            <label>Line3:</label>
+            <InputText class="form-control" @bind-Value="_model.Line3" />
+            <ValidationMessage For="@(() => _model.Line3)" />
+        </div>
+        <div class="form-group">
+            <label>City:</label>
+            <InputText class="form-control" @bind-Value="_model.City" />
+            <ValidationMessage For="@(() => _model.City)" />
+        </div>
+        <div class="form-group">
+            <label>State:</label>
+            <InputText class="form-control" @bind-Value="_model.State" />
+            <ValidationMessage For="@(() => _model.State)" />
+        </div>
+        <div class="form-group">
+            <label>Zip:</label>
+            <InputText class="form-control" @bind-Value="_model.Zip" />
+            <ValidationMessage For="@(() => _model.Zip)" />
+        </div>
+        <div class="form-group">
+            <label>Country:</label>
+            <InputText class="form-control" @bind-Value="_model.Country" />
+            <ValidationMessage For="@(() => _model.Country)" />
+        </div>
+        <h3>Options</h3>
+        <div class="checkbox">
+            <label class="form-label">
+                <InputCheckbox @bind-Value="_model.GiftWrap" class="darker-border-checkbox form-check-input" />
+                Gift wrap these items
+            </label>
+        </div>
+        <div class="text-center">
+            <input class="btn btn-primary" type="submit" value="Submit Order" />
+        </div>
+    </EditForm>
+}
+
+@code {
+    private string _title = "Checkout";
+    private Order _model = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _cartService.Load();
+            StateHasChanged();
+        }
+    }
+
+    private async Task submit()
+    {
+        _model.Lines = _cartService.Lines.ToList();
+        _orderRepository.SaveOrder(_model);
+        await _cartService.Clear();
+        var url = $"completed/{_model.Id}";
+        _navigationManager.NavigateTo(url);
+    }
+}

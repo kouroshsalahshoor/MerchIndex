@@ -1,0 +1,25 @@
+﻿@page "/companyregistersuccess"
+
+@* @attribute [Authorize] *@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+
+<div class="px-4 py-5 my-5 text-center">
+    <img class="d-block mx-auto mb-4" src="images/logo.png" alt="MerchIndex">
+    <h1 class="display-5 fw-bold text-success">@_title</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Tack så mycket</p>
+        <p class="mb-4">Vi kontrollerar era uppgifter och återkommer via e-post så snart vi kan.</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a type="button" class="btn btn-primary btn-lg px-4 gap-3" href="/">Hem</a>
+            <a type="button" class="btn btn-outline-primary btn-lg px-4" href="contact">Kontakta oss</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _title = "Företag är Registererat";
+
+}

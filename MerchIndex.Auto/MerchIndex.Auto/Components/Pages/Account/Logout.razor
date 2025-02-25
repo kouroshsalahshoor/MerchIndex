@@ -1,0 +1,11 @@
+﻿@page "/Logout"
+
+@inject SignInManager<ApplicationUser> _signInManager
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await _signInManager.SignOutAsync();
+        _navigationManager.NavigateTo("/");
+    }
+}

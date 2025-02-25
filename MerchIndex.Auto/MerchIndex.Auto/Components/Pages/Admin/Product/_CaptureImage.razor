@@ -1,0 +1,57 @@
+﻿@if (_show)
+{
+    <div class="modal fade show" id="staticBackdropLive" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLiveLabel" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLiveLabel">@_title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="close" title="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <video id="video" width="640" height="640" autoplay></video>
+                            <button @onclick="capture">Take Photo</button>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" @onclick="close" title="Close">Close</button>
+                    <button type="submit" class="btn btn-primary" title="Save">Save</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private bool _show { get; set; } = false;
+    private string _title = "Capture Image";
+    private List<string> _errors = new();
+
+    public async Task Show()
+    {
+        _show = true;
+        StateHasChanged();
+    }
+
+    private async Task close()
+    {
+        _show = false;
+        StateHasChanged();
+
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task capture()
+    {
+    }
+}

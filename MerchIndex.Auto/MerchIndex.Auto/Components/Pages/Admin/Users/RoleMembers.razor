@@ -1,0 +1,104 @@
+﻿@page "/admin/role/{id}/members"
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<h5 class="bg-primary text-white p-2">Members</h5>
+<table class="table table-sm table-striped table-bordered">
+    <thead><tr><th>User</th><th>Email</th><th></th></tr></thead>
+    <tbody>
+        @if (_members.Count() == 0)
+        {
+            <tr><td colspan="3" class="text-center">No members</td></tr>
+        }
+        @foreach (var user in _members)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td class="text-center">
+                    <button class="btn btn-primary btn-sm" @onclick="@(async () => await toggle(user))">
+                        Change
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h5 class="bg-primary-subtle text-white p-2">Non-Members</h5>
+<table class="table table-sm table-striped table-bordered">
+    <thead><tr><th>User</th><th>Email</th><th></th></tr></thead>
+    <tbody>
+        @if (_nonMembers.Count() == 0)
+        {
+            <tr><td colspan="3" class="text-center">No non-members</td></tr>
+        }
+        @foreach (var user in _nonMembers)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td class="text-center">
+                    <button class="btn btn-primary btn-sm" @onclick="@(async () => await toggle(user))">
+                        Change
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-light" href="@_indexUrl">Back</a>
+
+@code {
+    [Parameter] public string? Id { get; set; } = string.Empty;
+
+    private string? _title = string.Empty;
+    private List<string> _errors = new();
+    private string _indexUrl = "admin/roles";
+
+    private IdentityRole _model { get; set; } = new();
+    private List<ApplicationUser> _members = new();
+    private List<ApplicationUser> _nonMembers = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(Id) == false)
+        {
+            _model = await _roleManager.FindByIdAsync(Id) ?? new();
+            _title = $"Role: {_model.Name} Members";
+
+            await load();
+        }
+    }
+
+    private async Task load(){
+        _members = (await _userManager.GetUsersInRoleAsync(_model.Name!)).ToList();
+        _nonMembers = _userManager.Users.ToList().Except(_members).ToList();
+    }
+
+    private async Task toggle(ApplicationUser user)
+    {
+        if (user == null)
+        {
+            _errors.Add("User not found");
+            return;
+        }
+
+        if (await _userManager.IsInRoleAsync(user, _model.Name!))
+        {
+            await _userManager.RemoveFromRoleAsync(user, _model.Name!);
+        }
+        else
+        {
+            await _userManager.AddToRoleAsync(user, _model.Name!);
+        }
+
+        await load();
+    }
+}

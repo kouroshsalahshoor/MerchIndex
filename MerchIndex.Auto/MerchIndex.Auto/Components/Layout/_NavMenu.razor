@@ -1,0 +1,257 @@
+﻿@implements IDisposable
+@rendermode InteractiveServer
+
+@inject IHttpClientFactory HttpClientFactory
+
+<style>
+    .nav-link {
+        padding: 10px 5px;
+    }
+
+    .nav-link,
+    #navbarSupportedContent a,
+    footer > ul > li > a.text-body-secondary {
+        background-color: #FFFFFF;
+        color: black;
+    }
+
+        .nav-link:hover,
+        #navbarSupportedContent a:hover,
+        footer > ul > li > a.text-body-secondary:hover {
+            background-color: darkorange;
+            color: white;
+        }
+</style>
+
+<nav class="navbar navbar-expand-lg fixed-top bg-white">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="javascript:void(0);">
+            <img src="/images/logo.png" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <NavLink class="nav-link" aria-current="page" href="/"><i class="bi bi-house"></i> Hem</NavLink>
+                    @* <a class="nav-link active" aria-current="page" href="/">Home</a> *@
+                </li>
+                
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Products
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="admin/products"><i class="bi bi-archive"></i> Products</a></li>
+                                <li><a class="dropdown-item" href="admin/orders"><i class="bi bi-box2-heart"></i> Orders</a></li>
+                                @if (_currentUser.IsInRole(Constants.Role_Admins))
+                                {
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="admin/categories">Categories</a></li>
+                                }
+                            </ul>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+
+                <AuthorizeView Roles="@Constants.Role_Admins">
+                    <Authorized>
+
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="admin/companies">
+                                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Companies
+                            </NavLink>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Auth
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="admin/users">Users</a></li>
+                                <li><a class="dropdown-item" href="admin/roles">Roles</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="auth">
+                                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
+                            </NavLink>
+                        </li>
+                        @*<li class="nav-item">
+                            <NavLink class="nav-link" href="Account/Manage">
+                                <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+                            </NavLink>
+                        </li> *@
+
+                    </Authorized>
+                </AuthorizeView>
+
+                @* <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="Account/Manage">
+                                <span class="bi bi-person" aria-hidden="true"></span> @context.User.Identity?.Name
+                            </NavLink>
+                        </li>
+
+                        <li class="nav-item">
+                            <form action="/Account/Logout" method="post">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                                <button type="submit" class="nav-link"><i class="bi bi-box-arrow-right"></i> Logga ut</button>
+                            </form>
+                        </li>
+                    </Authorized>
+
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="companyregister"><i class="bi bi-person-plus"></i> Registrera Företag</NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="account/Login"><i class="bi bi-box-arrow-in-right"></i> Logga in</NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView> *@
+
+                @* <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li> *@
+
+                <li class="nav-item">
+                    <NavLink class="nav-link" aria-current="page" href="contact"><i class="bi bi-send"></i> Kontakt</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" aria-current="page" href="about"><i class="bi bi-info-square"></i> Om oss</NavLink>
+                </li>
+            </ul>
+
+            <div class="d-flex" role="search" title="Sök">
+                <div class="form-floating">
+                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm">
+                    <label for="floatingInputSearch" class="form-label">Sök</label>
+                </div>
+                <button class="btn btn-warning text-light mx-1" style="width:60px;"><i class="bi bi-search"></i></button>
+                @* <input class="form-control ms-1" type="search" placeholder="Sök produkter" aria-label="Search">
+                <button class="btn btn-warning text-light" type="submit"><i class="bi bi-search"></i></button> *@
+            </div>
+            @* <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form> *@
+
+            <AuthorizeView>
+                <Authorized>
+
+                    <div class="d-flex mx-1">
+                        <a class="nav-link" href="Account/Manage">
+                            <span class="bi bi-person" aria-hidden="true"></span> Välkommen @context.User.Identity?.Name
+                        </a>
+                    </div>
+
+                    @* <span class="navbar-text">
+                            <i class="bi bi-person"></i> Välkommen @context.User.Identity?.Name :)
+                        </span> *@
+
+                    <div class="d-flex mx-1">
+                        <form action="/Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                            <button type="submit" class="nav-link"><i class="bi bi-box-arrow-right"></i> Logga ut</button>
+                        </form>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="d-flex mx-1">
+                        <a class="nav-link" href="companyregister"><i class="bi bi-person-plus"></i> Registrera Företag</a>
+                    </div>
+                    <div class="d-flex mx-1">
+                        <a class="nav-link" href="account/Login"><i class="bi bi-box-arrow-in-right"></i> Logga in</a>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+            
+        </div>
+    </div>
+</nav>
+
+@code {
+    private string? _currentUrl;
+    private ClaimsPrincipal _currentUser = default!;
+    private string _searchTerm = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentUser = (await _authenticationStateProvider!.GetAuthenticationStateAsync()).User;
+
+        _currentUrl = _navigationManager.ToBaseRelativePath(_navigationManager.Uri);
+        _navigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private async Task HandleLogout()
+    {
+        var url = new Uri(new Uri(_navigationManager.BaseUri), "/account/LogOut").ToString();
+        var data = new Dictionary<string, string>();
+        await PostPageAsync(url, data);
+
+        // var client = HttpClientFactory.CreateClient();
+        // client.BaseAddress = new Uri("https://localhost:7228/");
+        // var response = await client.PostAsync("Account/Logout", null);
+        // if (response.IsSuccessStatusCode)
+        // {
+        //     _navigationManager.NavigateTo("/", true);
+        // }
+        // else
+        // {
+        //     // Handle error response
+        //     Console.WriteLine("Logout failed: " + response.StatusCode);
+        // }
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _currentUrl = _navigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _navigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private async Task<string> PostPageAsync(string url, IDictionary<string, string> data)
+    {
+        var content = new FormUrlEncodedContent(data);
+
+        using (var client = new HttpClient())
+        {
+            var response = await client.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return responseBody;
+            }
+
+            return response.StatusCode.ToString();
+        }
+    }
+}
+

@@ -1,0 +1,48 @@
+﻿@page "/LocalStorageClient"
+@rendermode InteractiveWebAssembly
+
+@inject LocalStorageService _localStorageService
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+@if (isConnected)
+{
+    <p>Current count: <strong>@currentCount</strong></p>
+    <button @onclick="IncrementCount">Increment</button>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private string _title = "LocalStorage Client";
+
+    private int currentCount;
+    private bool isConnected;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isConnected = true;
+            await LoadStateAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadStateAsync()
+    {
+        currentCount = await _localStorageService.GetAsync<int>("countclient");
+    }
+
+    private async Task IncrementCount()
+    {
+        currentCount++;
+        await _localStorageService.SetAsync("countclient", currentCount);
+
+        // await _localStorageService.RemoveAsync("count");
+        // await _localStorageService.ClearAsync();
+    }
+}

@@ -1,0 +1,132 @@
+﻿@page "/admin/products"
+@page "/admin"
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<p class="container">
+    <div class="input-group mb-3">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="search" placeholder="" @bind="_filter" @bind:event="oninput">
+            <label for="search">Search</label>
+        </div>
+        <span class="input-group-text bg-warning text-light px-3"><i class="bi bi-search"></i></span>
+    </div>
+</p>
+
+@* <QuickGrid Class="table table-striped table-hover" Items="_filteredItems" Pagination="_pagination"> *@
+<QuickGrid Class="table" Items="_filteredItems" Pagination="_pagination">
+    <PropertyColumn Property="x => x.Name" Sortable="true" />
+    <PropertyColumn Property="x => x.Price" Sortable="true" />
+    <PropertyColumn Property="x => x.Category" Sortable="true" />
+    <PropertyColumn Property="x => x.Tag" Sortable="true" />
+    <PropertyColumn Property="x => x.Company.Name" Sortable="true" Title="Company Name" />
+
+    <TemplateColumn Context="item" Class="text-center zero_width">
+        <HeaderTemplate>Image</HeaderTemplate>
+        <ChildContent>
+            <img src="@item.ImageUrl" width="40" />
+        </ChildContent>
+    </TemplateColumn>
+
+    <TemplateColumn Context="item" Class="text-center zero_width">
+        <HeaderTemplate><a class="btn btn-sm btn-primary mx-auto" href="admin/Product/create" title="Create"><i class="bi bi-plus-square"></i></a></HeaderTemplate>
+        <ChildContent>
+            <a class="btn btn-sm btn-warning" href="@($"admin/Product/update/{item.Id}")" title="Update"><i class="bi bi-pencil-square"></i></a>
+            <a class="btn btn-sm btn-info" href="@($"admin/Product/{item.Id}")" title="Details"><i class="bi bi-info-square"></i></a>
+            <button class="btn btn-sm btn-danger" @onclick="@(async() => await delete(item))" title="Delete"><i class="bi bi-trash"></i></button>
+        </ChildContent>
+    </TemplateColumn>
+
+</QuickGrid>
+<Paginator State="_pagination" />
+
+@code {
+    private ApplicationDbContext _db => Service;
+
+    private string _title = "Products";
+
+    private string _filter = string.Empty;
+    private IQueryable<Product> _filteredItems = default!;
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 10 };
+
+    protected override async void OnInitialized()
+    {
+        await load();
+    }
+
+    private async Task load()
+    {
+        _filteredItems = _db.Products.Include(x=>x.Company)
+        .Where(x => 
+            string.IsNullOrEmpty(_filter) ||
+            string.IsNullOrEmpty(x.Name) || x.Name!.ToLower().Contains(_filter.ToLower()) ||
+            x.Price.ToString()!.ToLower().Contains(_filter.ToLower()) ||
+            string.IsNullOrEmpty(x.Category) || x.Category!.ToLower().Contains(_filter.ToLower()) ||
+            string.IsNullOrEmpty(x.Tag) || x.Tag!.ToLower().Contains(_filter.ToLower()) ||
+            string.IsNullOrEmpty(x.Company.Name) || x.Company.Name!.ToLower().Contains(_filter.ToLower())
+        ).OrderByDescending(x => x.Id).AsQueryable();
+        // _filteredItems = _db.Products.Where(m => m.Name!.Contains(_filter)).OrderByDescending(x => x.Id);
+    }
+
+    private async Task delete(Product model)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            if (model is not null)
+            {
+                _db.Products.Remove(model);
+                await _db.SaveChangesAsync();
+
+                await _js.ToastrSuccess("Deleted successfully");
+
+                await load();
+            }
+        }
+    }
+
+    // private string _dir = string.Empty;
+
+    // protected async override Task OnInitializedAsync()
+    // {
+    //     base.OnInitialized();
+
+    //     // var user = (await _authStat!).User;
+    //     // if (!user.Identity!.IsAuthenticated)
+    //     // {
+    //     //     _navigationManager.NavigateTo($"login?returnUrl={Uri.EscapeDataString(_navigationManager.Uri)}");
+    //     // }
+
+    //     _dir = Path.Combine(_env.WebRootPath, "images", "products");
+    //     await load();
+    // }
+    // private async Task load()
+    // {
+    //     _items = await _db.Products.ToListAsync();
+    // }
+    // private async Task delete(Product p)
+    // {
+    //     if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+    //     {
+    //         _db.Products.Remove(p);
+    //         await _db.SaveChangesAsync();
+    //         await load();
+    //     }
+    // }
+
+    // private string? getImageUrl(long? id)
+    // {
+    //     var productDir = Path.Combine(_dir, id.ToString()!);
+    //     if (Directory.Exists(productDir))
+    //     {
+    //         var files = Directory.GetFiles(productDir);
+    //         if (files is not null && files.FirstOrDefault() is not null)
+    //         {
+    //             var fileName = new FileInfo(files.FirstOrDefault()!).Name;
+    //             return $"images/products/{id.ToString()}/{fileName}";
+    //         }
+    //     }
+    //     return $"images/default.png";
+    // }
+}

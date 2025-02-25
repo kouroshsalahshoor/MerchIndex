@@ -1,0 +1,25 @@
+﻿@page "/admin/adminuser"
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> _userManager
+@attribute [Authorize]
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<table class="table table-sm table-striped table-bordered">
+    <tbody>
+        <tr><th>User</th><td>@_adminUser!.UserName</td></tr>
+        <tr><th>Email</th><td>@_adminUser.Email</td></tr>
+        <tr><th>Phone</th><td>@_adminUser.PhoneNumber</td></tr>
+    </tbody>
+</table>
+
+@code {
+    private string _title = "Admin User";
+    private ApplicationUser? _adminUser { get; set; } = new();
+
+    override protected async Task OnInitializedAsync()
+    {
+        _adminUser = await _userManager.FindByNameAsync("Admin");
+    }
+}

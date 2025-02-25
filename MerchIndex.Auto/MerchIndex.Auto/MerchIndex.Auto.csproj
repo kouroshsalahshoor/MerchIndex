@@ -1,0 +1,104 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-SportsStore.Auto-2de2a637-52ce-4d71-aeae-f6dd123816f5</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Components\Pages\Account\**" />
+    <Compile Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
+    <Compile Remove="Components\Pages\Admin\Categories\CRUD - Copy\**" />
+    <Compile Remove="Components\Pages\Admin\Product\CRUD\**" />
+    <Compile Remove="Components\Pages\Admin\Product\x\**" />
+    <Compile Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <Compile Remove="Components\XHome\**" />
+    <Content Remove="Components\Pages\Account\**" />
+    <Content Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
+    <Content Remove="Components\Pages\Admin\Categories\CRUD - Copy\**" />
+    <Content Remove="Components\Pages\Admin\Product\CRUD\**" />
+    <Content Remove="Components\Pages\Admin\Product\x\**" />
+    <Content Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <Content Remove="Components\XHome\**" />
+    <EmbeddedResource Remove="Components\Pages\Account\**" />
+    <EmbeddedResource Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
+    <EmbeddedResource Remove="Components\Pages\Admin\Categories\CRUD - Copy\**" />
+    <EmbeddedResource Remove="Components\Pages\Admin\Product\CRUD\**" />
+    <EmbeddedResource Remove="Components\Pages\Admin\Product\x\**" />
+    <EmbeddedResource Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <EmbeddedResource Remove="Components\XHome\**" />
+    <None Remove="Components\Pages\Account\**" />
+    <None Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
+    <None Remove="Components\Pages\Admin\Categories\CRUD - Copy\**" />
+    <None Remove="Components\Pages\Admin\Product\CRUD\**" />
+    <None Remove="Components\Pages\Admin\Product\x\**" />
+    <None Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <None Remove="Components\XHome\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Components\Account\Pages\Login - Copy %282%29.razor" />
+    <Content Remove="Components\Account\Pages\Login - Copy.razor" />
+    <Content Remove="Components\App - Copy %282%29.razor" />
+    <Content Remove="Components\App - Copy.razor" />
+    <Content Remove="Components\Home - Copy %282%29.razor" />
+    <Content Remove="Components\Home - Copy %283%29.razor" />
+    <Content Remove="Components\Home - Copy.razor" />
+    <Content Remove="Components\Layout\AdminLayout.razor" />
+    <Content Remove="Components\Layout\EmptyLayout - Copy.razor" />
+    <Content Remove="Components\Layout\EmptyLayout.razor" />
+    <Content Remove="Components\Layout\MainLayout - Copy.razor" />
+    <Content Remove="Components\Layout\NavMenu - Copy.razor" />
+    <Content Remove="Components\Layout\SportsStoreLayout.razor" />
+    <Content Remove="Components\Layout\_Header.razor" />
+    <Content Remove="Components\Pages\Admin\Product\Index - Copy.razor" />
+    <Content Remove="Components\Routes - Copy.razor" />
+    <Content Remove="wwwroot\app.css" />
+    <Content Remove="wwwroot\css\site.css" />
+    <Content Remove="wwwroot\EmailTemplates\CompanyConfirmed - Copy.html" />
+    <Content Remove="wwwroot\EmailTemplates\email.html" />
+    <Content Remove="wwwroot\EmailTemplates\xCompanyConfirmed.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Components\Layout\AdminLayout.razor.css" />
+    <None Remove="Components\Layout\EmptyLayout.razor.css" />
+    <None Remove="Components\Layout\MainLayout - Copy.razor.css" />
+    <None Remove="Components\Layout\NavMenu - Copy.razor.css" />
+    <None Remove="Components\Layout\SportsStoreLayout.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MerchIndex.Auto.Client\MerchIndex.Auto.Client.csproj" />
+    <PackageReference Include="BlazorCameraStreamer" Version="3.0.1" />
+    <PackageReference Include="EPPlus" Version="7.6.0" />
+    <PackageReference Include="MailKit" Version="4.10.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\Companies\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Components\Pages\Companies\Register.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Update="wwwroot\images\x\logo - Copyx.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

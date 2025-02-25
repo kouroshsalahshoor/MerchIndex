@@ -1,0 +1,56 @@
+﻿@page "/demo/email"
+@using System.Net.Mail
+@using System.Net
+@* @using MailKit.Net.Smtp
+@using MimeKit *@
+
+@attribute [AllowAnonymous]
+@* @attribute [Authorize] *@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+
+@if (_loading)
+{
+    <div><_LoaderAdmin /></div>
+}
+
+<button class="btn btn-primary" @onclick="send">send email</button>
+
+@code {
+    private string _title = "Home";
+    private bool _loading = false;
+
+    private async Task send()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            // Specify the path to the HTML file
+            string filePath = _env.WebRootPath + "/EmailTemplates/CompanyConfirmed.html";
+
+            // Read the content of the file into a string
+            string body = File.ReadAllText(filePath);
+            await Task.Run(async () =>
+            {
+                _emailService.SendGmail(to:"kourosh23@hotmail.com", subject:"Testing", body:body);
+                // sendHotmail();
+                // System.Threading.Thread.Sleep(3000);
+                await _js.ToastrSuccess("Email sent successfully!");
+            });
+
+        }
+        catch (Exception e)
+        {
+            // Console.WriteLine($">>> Error sending email: {e.Message}");
+            await _js.ToastrError($">>> Error sending email: {e.Message}");
+        }
+
+        _loading = false;
+        StateHasChanged();
+    }
+}
+

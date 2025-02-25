@@ -1,0 +1,252 @@
+﻿@* @page "/admin/Company/create" *@
+@page "/admin/Company/update/{id:int}"
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<EditForm Model="_model" OnValidSubmit="submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    @if (_model.Id != 0)
+    {
+        <div class="form-floating py-1">
+            <input class="form-control" value="@_model.Id" id="Id" placeholder="" disabled />
+            <label for="Id">Id</label>
+        </div>
+    }
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Name" id="Name" placeholder="" />
+        <label for="Name">Name</label>
+        <ValidationMessage For="@(() => _model.Name)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.BusinessArea" id="BusinessArea" placeholder="" />
+        <label for="BusinessArea">BusinessArea</label>
+        <ValidationMessage For="@(() => _model.BusinessArea)" />
+    </div>
+    <div class="form-floating py-1">
+        <input class="form-control" value="@_model.Email" id="Email" placeholder="" disabled />
+        <label for="Email">Email</label>
+        @* <ValidationMessage For="@(() => _model.Email)" /> *@
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Tel" id="Price" placeholder="" />
+        <label for="Tel">Tel</label>
+        <ValidationMessage For="@(() => _model.Tel)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Address" id="Tag" placeholder="" />
+        <label for="Address">Address</label>
+        <ValidationMessage For="@(() => _model.Address)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.District" id="Tag" placeholder="" />
+        <label for="District">District</label>
+        <ValidationMessage For="@(() => _model.District)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.City" id="Tag" placeholder="" />
+        <label for="City">City</label>
+        <ValidationMessage For="@(() => _model.City)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputFile class="form-control" id="Image" OnChange="setUploadingFiles" accept="image/*" />
+        <label for="Image">Upload Image</label>
+        @* <ValidationMessage For="@(() => _model.Image)" /> *@
+
+        @if (_imageStrings!.Any())
+        {
+            <div class="row mt-2">
+                @foreach (var imageString in _imageStrings!)
+                {
+                    <div class="col-md-2">
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <a class="btn btn-danger btn-sm" @onclick="@(() => delete(imageString))" title="Delete"><i class="bi bi-trash"></i> Delete</a>
+                            </div>
+                            <div class="col-md-12">
+                                <img src="@imageString" alt="" class="img-thumbnail" style="width:100%" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            if (_fileInfos!.Any())
+            {
+                <div class="row mt-2">
+                    @foreach (var fileInfo in _fileInfos!)
+                    {
+                        <div class="col-md-2">
+                            <div class="row text-center">
+                                <div class="col-md-12">
+                                    <a class="btn btn-danger btn-sm" @onclick="@(async() => await delete(fileInfo))" title="Delete"><i class="bi bi-trash"></i> Delete</a>
+                                </div>
+                                <div class="col-md-12">
+                                    <img src="@($"/images/Companies/{_model.Id}/{fileInfo.Name}")" alt="@_model.Name" class="img-thumbnail" style="width:100%" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+    </div>
+
+    <div class="checkbox py-3">
+        <label class="form-label">
+            <InputCheckbox @bind-Value="_model.IsActive" class="darker-border-checkbox form-check-input" />
+            Is Active
+        </label>
+    </div>
+
+    <div class="checkbox py-3">
+        <label class="form-label">
+            <InputCheckbox @bind-Value="_model.HasBeenActivated" class="darker-border-checkbox form-check-input" disabled />
+            Has Been Activated
+        </label>
+    </div>
+
+    <div class="mt-1">
+        <button type="submit" class="btn btn-@(Id == 0 ? "primary" : "warning")" title="Save"><i class="bi bi-floppy"></i> Save</button>
+        <NavLink class="btn btn-light" href="/admin/Companies" title="Back to List"><i class="bi bi-list"></i>Back to List</NavLink>
+    </div>
+</EditForm>
+
+@code {
+    private ApplicationDbContext _db => Service;
+    [Parameter] public int Id { get; set; } = 0;
+
+    private string _title = " Company";
+    private Company _model { get; set; } = new();
+    private List<string> _errors { get; set; } = new();
+
+    private bool _loading;
+    private string _parentDirName = "Companies";
+    private List<string> _imageStrings = new();
+    private List<IBrowserFile>? _uploadingFiles = new();
+    private List<FileInfo>? _fileInfos = new();
+
+    private bool _isFirstTime;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _title = Id == 0 ? "Create" : "Update" + _title;
+        if (Id != 0)
+        {
+            _model = _db.Companies.FirstOrDefault(p => p.Id == Id) ?? new();
+            _fileInfos = _imageService.GetFileInfos(_parentDirName, Id.ToString());
+        }
+    }
+
+    private async Task submit()
+    {
+        // _loading = true;
+        // StateHasChanged();
+
+        _errors.Clear();
+
+        if (_model.IsActive && _model.HasBeenActivated == false)
+        {
+            _model.HasBeenActivated = true;
+            _model.ActiveOn = DateTime.Now;
+            _isFirstTime = true;
+        }
+
+        if (Id == 0)
+        {
+            if (await _db.Companies.AnyAsync(x => x.Name == _model.Name))
+            {
+                _errors.Add(Constants.SameNameText);
+                return;
+            }
+            _db.Companies.Add(_model);
+        }
+        else
+        {
+            if (await _db.Companies.AnyAsync(x => x.Name == _model.Name && x.Id != _model.Id))
+            {
+                _errors.Add(Constants.SameNameText);
+                return;
+            }
+            _db.Companies.Update(_model);
+        }
+
+        if (await _db.SaveChangesAsync() > 0)
+        {
+            if (_uploadingFiles is not null && _uploadingFiles!.Any())
+            {
+                _imageService.DeleteAll(_parentDirName, _model.Id.ToString());
+                await _imageService.UploadFiles(_parentDirName, Id.ToString(), _uploadingFiles!);
+            }
+
+            //send email
+            if (_isFirstTime)
+            {
+                _emailService.SendConfirmationGmail(_model.Email);
+            }
+
+            // await _js.ToastrSuccess("Image Deleted");
+            // await Task.Delay(1000);
+
+            _navigationManager?.NavigateTo("/admin/Companies");
+        }
+        else
+        {
+            _errors.Add(Constants.SaveErrorText);
+            await _js.ToastrError(Constants.SaveErrorText);
+        }
+
+        // _loading = false;
+        // StateHasChanged();
+    }
+
+    private async Task setUploadingFiles(InputFileChangeEventArgs e)
+    {
+        _uploadingFiles = e.GetMultipleFiles().ToList();
+
+        await setImageStrings(_uploadingFiles);
+    }
+
+    private async Task setImageStrings(List<IBrowserFile> browserFiles)
+    {
+        _imageStrings.Clear();
+        foreach (var file in browserFiles)
+        {
+            _imageStrings.Add(await _imageService.ToBase64(file));
+        }
+    }
+
+    private async Task delete(FileInfo fileInfo)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            if (_imageService.Delete(_parentDirName, Id.ToString(), fileInfo))
+            {
+                _fileInfos?.Remove(fileInfo);
+                // await _js.ToastrSuccess("Image Deleted");
+            }
+            else
+            {
+                // await _js.ToastrError("Error deleting Image");
+            }
+        }
+    }
+
+    private void delete(IBrowserFile file)
+    {
+        _uploadingFiles!.Remove(file);
+    }
+
+    private void delete(string file)
+    {
+        _imageStrings!.Remove(file);
+    }
+}

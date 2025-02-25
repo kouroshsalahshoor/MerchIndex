@@ -1,0 +1,140 @@
+﻿@page "/admin/user/create"
+@page "/admin/user/update/{id}"
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+<h3 class="bg-@(string.IsNullOrEmpty(Id) ? "primary" :"warning") text-white text-center p-2">@_title</h3>
+<EditForm Model="_model" OnValidSubmit="submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    @if (_errors.Any())
+    {
+        <ul class="text-danger">
+            @foreach (string error in _errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    }
+    <div class="form-group">
+        <label>UserName</label>
+        <ValidationMessage For="@(() => _model.UserName)" />
+        <InputText class="form-control" @bind-Value="_model.UserName" />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <ValidationMessage For="@(() => _model.Email)" />
+        <InputText class="form-control" @bind-Value="_model.Email" />
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <ValidationMessage For="@(() => _model.Password)" />
+        <InputText class="form-control" @bind-Value="_model.Password" />
+    </div>
+    <div class="form-group">
+        <label>Role</label>
+        <InputSelect id="country" @bind-Value="_model.Role" class="form-select">
+            <option selected disabled value="0">Please Select a Role</option>
+            <option value="@Constants.Role_Users">@Constants.Role_Users</option>
+            <option value="@Constants.Role_Admins">@Constants.Role_Admins</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => _model.Role)" />
+    </div>
+    <div class="py-2">
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a class="btn btn-light" href="admin/users">Back</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public string? Id { get; set; } = string.Empty;
+
+    private string? _title = string.Empty;
+    private List<string> _errors = new();
+    private UserViewModel _model = new();
+    private ApplicationUser? _user;
+    private string? _userRole = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _title = string.IsNullOrEmpty(Id) ? "Create" : "Update" + " User";
+
+        if (string.IsNullOrEmpty(Id) == false)
+        {
+            _user = await _userManager.FindByIdAsync(Id);
+            if (_user is not null)
+            {
+                _model.UserName = _user.UserName!;
+                _model.Email = _user.Email!;
+                _userRole = (await _userManager.GetRolesAsync(_user)).FirstOrDefault() ?? string.Empty;
+                _model.Role = _userRole;
+            }
+        }
+    }
+
+    private async Task submit()
+    {
+        _errors.Clear();
+        IdentityResult result = new();
+
+        if (string.IsNullOrEmpty(Id))
+        {
+            if (string.IsNullOrEmpty(_model.Password))
+            {
+                _errors.Add("Please enter a password");
+                return;
+            }
+
+            _user = new ApplicationUser { UserName = _model.UserName, Email = _model.Email };
+            result = await _userManager.CreateAsync(_user, _model.Password);
+        }
+        else
+        {
+            _user!.UserName = _model.UserName;
+            _user.Email = _model.Email;
+
+            result = await _userManager.UpdateAsync(_user);
+            if (result.Succeeded && !string.IsNullOrEmpty(_model.Password))
+            {
+                await _userManager.RemovePasswordAsync(_user);
+                result = await _userManager.AddPasswordAsync(_user, _model.Password);
+            }
+
+            if (result.Succeeded && _model.Role != _userRole && string.IsNullOrEmpty(_userRole) == false)
+            {
+                result = await _userManager.RemoveFromRoleAsync(_user, _userRole!);
+            }
+        }
+
+        if (result.Succeeded)
+        {
+            result = await _userManager.AddToRoleAsync(_user, _model.Role);
+        }
+
+        if (result.Succeeded)
+        {
+            _navigationManager.NavigateTo("/admin/users");
+        }
+
+        foreach (IdentityError err in result.Errors)
+        {
+            _errors.Add(err.Description);
+        }
+    }
+
+    private class UserViewModel
+    {
+        [Required]
+        public string UserName { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        // [Required]
+        public string? Password { get; set; } = string.Empty;
+        [Required]
+        public string Role { get; set; } = string.Empty;
+    }
+}

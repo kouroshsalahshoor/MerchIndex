@@ -1,0 +1,89 @@
+﻿@page "/admin/roles"
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Members</th>
+            <th class="text-center">
+                <a class="btn btn-sm btn-primary" href="admin/role/create">Create</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_items.Count() == 0)
+        {
+            <tr><td colspan="4" class="text-center">No Roles</td></tr>
+        }
+        else
+        {
+            foreach (var item in _items)
+            {
+                <tr>
+                    <td>@item.Role.Id</td>
+                    <td>@item.Role.Name</td>
+                    <td>@item.Members</td>
+                    <td class="text-center">
+                        <a class="btn btn-sm btn-warning" href="admin/role/update/@item.Role.Id">Update</a>
+                        <a class="btn btn-sm btn-info" href="admin/role/@item.Role.Id/members">Members</a>
+                        <button class="btn btn-sm btn-danger" @onclick="@(async () => await delete(item.Role))">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    private string _title = "Roles";
+
+    private List<RoleVM> _items { get; set; } = new ();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await load();
+    }
+
+    private async Task load()
+    {
+        var roles = await _roleManager.Roles.ToListAsync();
+        foreach (var role in roles)
+        {
+            _items.Add(new RoleVM { Role = role, Members = await getMembersString(role.Name!) });
+        }
+    }
+
+    private async Task<string> getMembersString(string roleName)
+    {
+        if (string.IsNullOrEmpty(roleName) == false)
+        {
+            IEnumerable<IdentityUser> users = (await _userManager.GetUsersInRoleAsync(roleName));
+            string result = users.Count() == 0 ? "No members" : string.Join(", ", users.Take(3).Select(u => u.UserName).ToArray());
+            return users.Count() > 3 ? $"{result}, (plus others)" : result;
+        }
+        return "string.Empty";
+    }
+
+    private async Task delete(IdentityRole role)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            await _roleManager.DeleteAsync(role);
+            await load();
+        }
+    }
+
+    private class RoleVM
+    {
+        public IdentityRole Role { get; set; } = null!;
+        public string Members { get; set; } = null!;
+    }
+}

@@ -1,0 +1,77 @@
+﻿@page "/xadmin/product/update/{id:long}"
+@page "/xadmin/product/create"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>@_title</PageTitle>
+<h2>@_title</h2>
+<hr />
+
+<EditForm Model="_model" OnValidSubmit="submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    @if (_model.Id != 0)
+    {
+        <div class="form-floating py-1">
+            <InputNumber class="form-control" @bind-Value="_model.Id" id="Id" placeholder="" disabled />
+            <label for="Id">Id</label>
+        </div>
+    }
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Name" id="Name" placeholder="" />
+        <label for="Name">Name</label>
+        <ValidationMessage For="@(() => _model.Name)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Description" id="Description" placeholder="" />
+        <label for="Description">Description</label>
+        <ValidationMessage For="@(() => _model.Description)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputText class="form-control" @bind-Value="_model.Category" id="Category" placeholder="" />
+        <label for="Category">Category</label>
+        <ValidationMessage For="@(() => _model.Category)" />
+    </div>
+    <div class="form-floating py-1">
+        <InputNumber class="form-control" @bind-Value="_model.Price" id="Price" placeholder="" />
+        <label for="Price">Price</label>
+        <ValidationMessage For="@(() => _model.Price)" />
+    </div>
+    <div class="mt-1">
+        <button type="submit" class="btn btn-@(Id == 0 ? "primary" : "warning")" title="Save"><i class="bi bi-floppy"></i> Save</button>
+        <NavLink class="btn btn-light" href="/admin/products" title="Back to List"><i class="bi bi-list"></i>Back to List</NavLink>
+    </div>
+</EditForm>
+
+@code {
+    private ApplicationDbContext _db => Service;
+    [Parameter] public long Id { get; set; } = 0;
+
+    private string _title = "Products";
+    private Product _model { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        _title = Id == 0 ? "Create" : "Update";
+        if (Id != 0)
+        {
+            _model = _db.Products.FirstOrDefault(p => p.Id == Id) ?? new();
+        }
+    }
+    private async Task submit()
+    {
+        if (Id == 0)
+        {
+            _db.Products.Add(_model);
+        }
+        else
+        {
+            _db.Products.Update(_model);
+        }
+
+        await _db.SaveChangesAsync();
+
+        _navigationManager?.NavigateTo("/admin/products");
+    }
+}

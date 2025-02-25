@@ -1,0 +1,66 @@
+﻿@* @implements IAsyncDisposable *@
+
+@if (_show)
+{
+    <div class="modal fade show" id="staticBackdropLive" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLiveLabel" style="display: block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLiveLabel">@_title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="close" title="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div>
+                        @if (_model is null)
+                        {
+                            <p><em>Loading...</em></p>
+                        }
+                        else
+                        {
+                            <dl class="row">
+                                <dt class="col-sm-2">Id</dt>
+                                <dd class="col-sm-10">@_model.Id</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="col-sm-2">Name</dt>
+                                <dd class="col-sm-10">@_model.Name</dd>
+                            </dl>
+                            @* <div>
+                                <a class="btn btn-warning" href="@($"/admin/category/update/{Model.Id}")">Edit</a>
+                            </div> *@
+                        }
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" @onclick="close" title="Close">Close</button>
+                    @* <button type="button" class="btn btn-primary" title="Save">Save</button> *@
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    private bool _show { get; set; } = false;
+    private string _title = "Details";
+
+    private Category _model { get; set; } = new();
+
+    public async Task Show(Category model)
+    {
+        _model = model;
+        _show = true;
+        StateHasChanged();
+    }
+
+    private async Task close()
+    {
+        _show = false;
+        StateHasChanged();
+    }
+
+    // public async ValueTask DisposeAsync() => ;
+}

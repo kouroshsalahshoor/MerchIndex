@@ -1,0 +1,215 @@
+﻿@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<style>
+    .card-img-top {
+        transition: transform 0.3s ease;
+    }
+
+        .card-img-top:hover {
+            transform: scale(1.1);
+        }
+</style>
+
+<div class="album py-5">
+    <div class="container text-center">
+
+        <div class="row align-items-center g-2 mb-3">
+            <div class="col-md">
+                <div class="form-floating">
+                    <select class="form-select" id="floatingSelectCategory" @onchange="selectedCategory">
+                        <option value="" selected disabled>Kategorier</option>
+                        <option value="">Alla</option>
+
+                        @foreach (var item in _categories ?? new())
+                        {
+                            if (string.IsNullOrEmpty(item) == false)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                    <label for="floatingSelectCategory">Välj en Kategorier</label>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <select class="form-select" id="floatingSelectManifacturer" @onchange="selectedManifacturer">
+
+                        <option value="" selected disabled>Tillverkare</option>
+                        <option value="">Alla</option>
+
+                        @foreach (var item in _manifacturers ?? new())
+                        {
+                            if (string.IsNullOrEmpty(item) == false)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                    <label for="floatingSelectManifacturer">Välj en Tillverkare</label>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <select class="form-select" id="floatingSelectSort" @onchange="selectedSortBy">
+                        <option value="" selected>Id</option>
+                        <option value="name">Namn</option>
+                        <option value="price">Pris</option>
+                        <option value="category">Kategori</option>
+                        <option value="manifacturer">Tillverkare</option>
+                    </select>
+                    <label for="floatingSelectSort">Sortera</label>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @oninput="search">
+                    <label for="floatingInputSearch" class="form-label">Produkt / Service sökning....</label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-warning text-light" @onclick="@(async() => await load())" title="Sök" style="font-size: 28px;"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-6 g-6">
+
+            @foreach (var item in _items)
+            {
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" src="@item.ImageUrl" />
+                        <div class="card-body text-center">
+                            <p class="card-text fw-bold">@item.Name</p>
+                            <p class="card-text">@item.Price.ToString("c")</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary">View</button>
+                                </div>
+                                <small class="text-body-secondary">@item.Category</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    // [Parameter] public string? SearchTerm { get; set; }
+
+    private ApplicationDbContext _db => Service;
+
+    private IQueryable<Product> _query = default!;
+    private List<Product> _items = new();
+    private List<string> _categories = new();
+    private string? _selectedCategory;
+    private List<string>? _manifacturers = new();
+    private string? _selectedManifacturer;
+    private string? _selectedSortBy;
+    private int _page = 1;
+    private int _pageSize = 100;
+    private string? _searchTerm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _query = _db.Products
+            .AsNoTracking()
+            .AsQueryable();
+
+        _categories = await _query.Select(x => x.Category).Distinct().ToListAsync();
+        _manifacturers = await _query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
+        // _items = await _query
+        //     .Skip((_page - 1) * _pageSize)
+        //     .Take(_pageSize)
+        //     .OrderByDescending(x => x.Id)
+        //     .ToListAsync();
+
+        await load();
+    }
+
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     if (string.IsNullOrEmpty(SearchTerm) == false)
+    //     {
+    //         await load();
+    //     }
+    // }
+
+    private async Task load()
+    {
+        _query = _query
+            .Where(x =>
+                (
+                    string.IsNullOrEmpty(_searchTerm) ||
+                    x.Name.Contains(_searchTerm.Trim().ToLower()) ||
+                    x.Price.ToString().Contains(_searchTerm.Trim().ToLower()) ||
+                   x.Category.ToLower().Contains(_searchTerm.Trim().ToLower())
+                ) &&
+                (string.IsNullOrEmpty(_selectedCategory) || x.Category == _selectedCategory) &&
+                (string.IsNullOrEmpty(_selectedManifacturer) || x.Manifacturer == _selectedManifacturer)
+            )
+            .Skip((_page - 1) * _pageSize)
+            .Take(_pageSize);
+
+        if (_selectedSortBy == "name")
+        {
+            _query = _query.OrderBy(x => x.Name);
+        }
+        else if (_selectedSortBy == "price")
+        {
+            _query = _query.OrderBy(x => x.Price);
+        }
+        else if (_selectedSortBy == "category")
+        {
+            _query = _query.OrderBy(x => x.Category);
+        }
+        else
+        {
+            _query = _query.OrderBy(x => x.Id);
+        }
+
+        _items = await _query.ToListAsync();
+    }
+
+    private async Task selectedCategory(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            _selectedCategory = (string)e.Value;
+
+            await load();
+        }
+    }
+
+    private async Task selectedManifacturer(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            _selectedManifacturer = (string)e.Value;
+
+            await load();
+        }
+    }
+
+    private async Task selectedSortBy(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            _selectedSortBy = (string)e.Value;
+
+            await load();
+        }
+    }
+
+    private async Task search(ChangeEventArgs e)
+    {
+        if (e.Value is not null)
+        {
+            _searchTerm = (string)e.Value;
+            await load();
+        }
+    }
+}

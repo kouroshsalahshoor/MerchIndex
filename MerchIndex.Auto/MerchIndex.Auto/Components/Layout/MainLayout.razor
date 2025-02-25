@@ -1,0 +1,28 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <_NavMenu />
+
+    <main>
+        <div class="container" style="margin-top:120px;margin-bottom:120px;">
+            @Body
+        </div>
+    </main>
+
+    <_Footer />
+</div>
+
+@* <div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div> *@
+
+@code {
+    private string? _currentUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _currentUrl = _navigationManager.ToBaseRelativePath(_navigationManager.Uri).ToLower();
+    }
+}

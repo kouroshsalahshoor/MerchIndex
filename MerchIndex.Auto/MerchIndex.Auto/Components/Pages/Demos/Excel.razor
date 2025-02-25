@@ -1,0 +1,89 @@
+﻿@page "/demos/excel"
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@attribute [AllowAnonymous]
+
+@inject FileService _fileService
+@inject ExcelService _excelService
+
+@* https://www.youtube.com/watch?v=4UAgSfgWbVE *@
+<h3>Excel</h3>
+
+@* For Excel Files 97-2003 (.xls), use:
+application/vnd.ms-excel
+
+For Excel Files 2007+ (.xlsx), use:
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet *@
+<div class="mb-3">
+    <label for="formFile" class="form-label">Excel</label>
+    <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" OnChange="uploadFile" />
+
+@*     <input type="file" accept=".xlsx, .xls, .csv" />
+    <input class="form-control" type="file" id="formFile"> *@
+</div>
+
+@if (_items is null)
+{
+    <p>Loading ...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Category</th>
+                <th scope="col">Manifacturer</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in _items)
+            {
+                <tr>
+                    <th scope="row">@(_row++)</th>
+                    <td>@item.Name</td>
+                    <td>@item.Price.ToString("c")</td>
+                    <td>@item.Category</td>
+                    <td>@item.Manifacturer</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Product> _items = new List<Product>();
+    private int _row = 1;
+
+    private string _path => Path.Combine(_env.WebRootPath, "files", "excels");
+
+    protected override void OnInitialized()
+    {
+        _items = _excelService.GetProducts();
+    }
+
+    // private async Task setUploadingFiles(InputFileChangeEventArgs e)
+    // {
+    //     var uploadingFile = e.GetMultipleFiles().FirstOrDefault();
+
+    //     await _fileService.UploadFile("files", "excels", "1", uploadingFile!);
+    // }
+
+    // private string? GetFile(int? id)
+    // {
+    //     var dir = Path.Combine(_path, id.ToString()!);
+    //     if (Directory.Exists(dir))
+    //     {
+    //         var files = Directory.GetFiles(dir);
+    //         if (files is not null && files.FirstOrDefault() is not null)
+    //         {
+    //             var fileName = new FileInfo(files.FirstOrDefault()!).Name;
+    //             return $"images/Companies/{id.ToString()}/{fileName}";
+    //         }
+    //     }
+    //     return $"images/default.png";
+    // }
+}

@@ -1,0 +1,94 @@
+﻿@page "/people"
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+<h5 class="bg-primary text-white text-center p-2">@_title</h5>
+
+<table class="table table-sm table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Dept</th>
+            <th>Location</th>
+            <th class="text-center">
+                <a class="btn btn-sm btn-primary" href="/person/create">Create</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_items!.Count() == 0)
+        {
+            <tr><th colspan="5" class="p-4 text-center">Loading Data...</th></tr>
+        }
+        else
+        {
+            @foreach (var item in _items!)
+            {
+                <tr class="@getClass(item?.Location?.City)">
+                    <td>@item?.Id</td>
+                    <td>@item?.Surname, @item?.Firstname</td>
+                    <td>@item?.Department?.Name</td>
+                    <td>@item?.Location?.City</td>
+                    <td class="text-center">
+                        <a class="btn btn-sm btn-info" href="person/@item?.Id">
+                            Details
+                        </a>
+                        <a class="btn btn-sm btn-warning" href="person/update/@item?.Id">
+                            Update
+                        </a>
+                        <button class="btn btn-sm btn-danger" @onclick="@(async () => await delete(item!))">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<div class="form-group">
+    <label for="select-city">City</label>
+    <select name="select-city" class="form-control" @bind="_selectedCity">
+        <option disabled selected value="">Please Select a City</option>
+        @foreach (string item in _cities!)
+        {
+            <option value="@item" selected="@(item == _selectedCity)">
+                @item
+            </option>
+        }
+    </select>
+</div>
+
+@code {
+    ApplicationDbContext? _db => Service;
+
+    private string _title = "People";
+    private IEnumerable<Person> _items { get; set; } = Enumerable.Empty<Person>();
+    private IEnumerable<string>? _cities;
+    private string _selectedCity { get; set; } = string.Empty;
+    private string getClass(string? city) => _selectedCity == city ? "table-info" : "";
+
+    protected async override Task OnInitializedAsync()
+    {
+        _cities = _db?.Locations.Select(l => l.City).ToList();
+        await load();
+    }
+    private async Task load()
+    {
+        _items = await _db!.People.Include(p => p.Department).Include(p => p.Location).AsNoTracking().ToListAsync<Person>();
+    }
+
+    private async Task delete(Person p)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            if (_db != null)
+            {
+                _db.Remove(p);
+                await _db.SaveChangesAsync();
+                await load();
+            }
+        }        
+    }
+}

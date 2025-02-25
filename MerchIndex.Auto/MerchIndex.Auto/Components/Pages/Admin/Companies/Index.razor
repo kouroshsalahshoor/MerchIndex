@@ -1,0 +1,123 @@
+﻿@page "/admin/Companies"
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<div class="table-responsive">
+    <table class="table table-sm table-striped table-bordered table-hover align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Business Area</th>
+                <th>District</th>
+                <th>City</th>
+                <th style="width:1px; white-space: nowrap;">Is Active</th>
+                <th style="width:1px; white-space: nowrap;">Has been Actived</th>
+                <th>Image</th>
+                <td class="text-center">
+                    @* <NavLink class="btn btn-sm btn-primary" href="/admin/Company/create" title="Create"><i class="bi bi-plus-square"></i> Create</NavLink> *@
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            @if (_items.Any())
+            {
+                @foreach (var item in _items)
+                {
+                    <tr class="@(item.IsActive ? "" : "table-danger")">
+                        <td>@item.Id</td>
+                        <td>@item.Name</td>
+                        <td>@item.Email</td>
+                        <td>@item.BusinessArea</td>
+                        <td>@item.District</td>
+                        <td>@item.City</td>
+                        <td class="text-center">@item.IsActive</td>
+                        <td class="text-center">@item.HasBeenActivated</td>
+                        @* <td class="text-center"><InputCheckbox @bind-Value="@item.IsActive" @onclick="async () => await toggleActive(item)" /></td> *@
+                        <td class="text-center" style="width:40px;"><img src="@_imageService.GetUrl(_dirName, item.Id.ToString())" alt="@item.Name" class="img-thumbnail" style="width:40px" /></td>
+                        <td class="text-center zero_width">
+                            <NavLink class="btn btn-info btn-sm" href="@($"/admin/Company/{item.Id}")" title="Details"><i class="bi bi-info-square"></i> Details</NavLink>
+                            <NavLink class="btn btn-warning btn-sm" href="@($"/admin/Company/update/{item.Id}")" title="Update"><i class="bi bi-pencil-square"></i> Update</NavLink>
+                            <button class="btn btn-danger btn-sm" @onclick="@(e => delete(item))" title="Delete"><i class="bi bi-trash"></i> Delete</button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center">No Companies</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [CascadingParameter] protected Task<AuthenticationState> _authenticationState { get; set; }
+    private ApplicationDbContext _db => Service;
+
+    private string _title = "Companies";
+    private IEnumerable<Company> _items { get; set; } = Enumerable.Empty<Company>();
+
+    private string _dirName = "Companies";
+    // private string _dir => Path.Combine(_env.WebRootPath, "images", "Companies");
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        var user = (await _authenticationState!).User;
+        if (!user.Identity!.IsAuthenticated)
+        {
+            _navigationManager.NavigateTo("/401Unauthorized");
+        }
+        else if (!user.IsInRole(Constants.Role_Admins))
+        {
+            _navigationManager.NavigateTo("/403Forbidden");
+        }
+
+        // _dir = Path.Combine(_env.WebRootPath, "images", "Companies");
+        await load();
+    }
+
+    private async Task load()
+    {
+        _items = await _db.Companies.ToListAsync();
+    }
+    private async Task delete(Company p)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            _db.Companies.Remove(p);
+            await _db.SaveChangesAsync();
+            await load();
+        }
+    }
+    private async Task toggleActive(Company model)
+    {
+        model.IsActive = !model.IsActive;
+        _db.Companies.Update(model);
+        await _db.SaveChangesAsync();
+
+        await load();
+    }
+
+    // private string? getImageUrl(int? id)
+    // {
+    //     var dir = Path.Combine(_dir, id.ToString()!);
+    //     if (Directory.Exists(dir))
+    //     {
+    //         var files = Directory.GetFiles(dir);
+    //         if (files is not null && files.FirstOrDefault() is not null)
+    //         {
+    //             var fileName = new FileInfo(files.FirstOrDefault()!).Name;
+    //             return $"images/Companies/{id.ToString()}/{fileName}";
+    //         }
+    //     }
+    //     return $"images/default.png";
+    // }
+}

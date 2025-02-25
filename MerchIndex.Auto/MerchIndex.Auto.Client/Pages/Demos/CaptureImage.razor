@@ -1,0 +1,46 @@
+﻿@page "/capture-image"
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+
+@rendermode InteractiveWebAssembly
+
+<h3>Capture Image</h3>
+
+<video id="video" width="400" height="300"></video>
+<br />
+<canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+<input id="imageData" />
+<br />
+<img id="image" />
+@* <input type="hidden" id="imageData" /> *@
+<br />
+
+<button @onclick="captureImage">Capture Image</button>
+<button @onclick="SaveImage">Save Image</button>
+
+@code {
+    [Inject]
+    private IApiService _apiService { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("captureImage.startCamera", "video");
+        }
+    }
+
+    private async Task captureImage()
+    {
+        await JSRuntime.InvokeVoidAsync("captureImage.captureImage", "video", "canvas", "imageData");
+    }
+
+    private async Task SaveImage()
+    {
+        var imageData = await JSRuntime.InvokeAsync<string>("eval", "document.getElementById('imageData').value");
+        // Send imageData to the server
+
+        var x = await _apiService.SaveImageLocalApiAsync(imageData);
+        // await Http.PostAsJsonAsync("api/image/save", new { ImageData = imageData });
+    }
+}

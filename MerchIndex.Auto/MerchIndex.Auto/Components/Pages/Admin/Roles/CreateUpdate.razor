@@ -1,0 +1,79 @@
+﻿@page "/admin/role/create"
+@page "/admin/role/update/{id}"
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+<h3 class="bg-@(string.IsNullOrEmpty(Id) ? "primary" :"warning") text-white text-center p-2">@_title</h3>
+<EditForm Model="_model" OnValidSubmit="submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    @if (_errors.Any())
+    {
+        <ul class="text-danger">
+            @foreach (string error in _errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    }
+    <div class="form-group">
+        <label>Name</label>
+        <ValidationMessage For="@(() => _model.Name)" />
+        <InputText class="form-control" @bind-Value="_model.Name" />
+    </div>
+    <div class="py-2">
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a class="btn btn-light" href="@_indexUrl">Back</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public string? Id { get; set; } = string.Empty;
+
+    private string? _title = string.Empty;
+    private List<string> _errors = new();
+    private IdentityRole _model = new();
+    private string _indexUrl = "admin/roles";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _title = string.IsNullOrEmpty(Id) ? "Create" : "Update" + " Role";
+
+        if (string.IsNullOrEmpty(Id) == false)
+        {
+            var model = await _roleManager.FindByIdAsync(Id);
+            if (model is not null)
+            {
+                _model = model;
+            }
+        }
+    }
+
+    private async Task submit()
+    {
+        _errors.Clear();
+        IdentityResult result = new();
+
+        if (string.IsNullOrEmpty(Id))
+        {
+            result = await _roleManager.CreateAsync(_model);
+        }
+        else
+        {
+            result = await _roleManager.UpdateAsync(_model);
+        }
+
+        if (result.Succeeded)
+        {
+            _navigationManager.NavigateTo(_indexUrl);
+        }
+
+        foreach (IdentityError err in result.Errors)
+        {
+            _errors.Add(err.Description);
+        }
+    }
+}
