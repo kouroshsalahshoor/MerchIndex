@@ -1,13 +1,20 @@
 ﻿
-.card-img-top,
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+    .card-img-top:hover {
+        transform: scale(1.1);
+    }
+/*.card-img-top,
 .card-cover {
     transition: transform 0.3s ease;
 }
 
-    .card-img-top:hover,
+.card-img-top:hover,
     .card-cover:hover {
         transform: scale(1.1);
-    }
+    }*/
 
 .card-cover {
     background-repeat: no-repeat;
