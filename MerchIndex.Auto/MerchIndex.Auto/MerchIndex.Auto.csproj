@@ -56,7 +56,6 @@
     <Content Remove="Components\Pages\Admin\Product\Index - Copy.razor" />
     <Content Remove="Components\Routes - Copy.razor" />
     <Content Remove="wwwroot\app.css" />
-    <Content Remove="wwwroot\css\site.css" />
     <Content Remove="wwwroot\EmailTemplates\CompanyConfirmed - Copy.html" />
     <Content Remove="wwwroot\EmailTemplates\email.html" />
     <Content Remove="wwwroot\EmailTemplates\xCompanyConfirmed.html" />

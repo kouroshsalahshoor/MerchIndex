@@ -1,9 +1,25 @@
 ﻿
+.card-img-top,
+.card-cover {
+    transition: transform 0.3s ease;
+}
+
+    .card-img-top:hover,
+    .card-cover:hover {
+        transform: scale(1.1);
+    }
+
+.card-cover {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+/*
 input, .shop.login .form .form-group input {
     border: 1px solid #e6e2f5;
 }
-
-/*a:visited {
+a:visited {
     color: white;
 }
 .zero_width {
