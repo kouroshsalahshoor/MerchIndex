@@ -10,6 +10,7 @@ using MerchIndex.Auto.Repository.IRepository;
 using MerchIndex.Auto.Services;
 using MerchIndex.Auto.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,6 +118,9 @@ builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<FileService>();
 builder.Services.AddScoped<ExcelService>();
+
+builder.Services.AddGeolocationService();
+builder.Services.AddNominatimGeocoderService();
 
 var app = builder.Build();
 

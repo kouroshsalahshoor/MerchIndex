@@ -21,6 +21,8 @@
 @* https://getbootstrap.com/docs/5.3/examples/features/ *@
 <h2 class="pb-2 border-bottom">@_title</h2>
 
+<_Paging />
+
 <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
 
     @foreach (var item in _items)
@@ -69,16 +71,23 @@
     protected override async Task OnInitializedAsync()
     {
         // _items = await _db.Companies.ToListAsync();
-        for (int i = 1; i <= 1000; i++)
+        for (int city = 1; city <= 10; city++)
         {
-            _items.Add(new Company
+            for (int district = 1; district <= 10; district++)
+            {
+                for (int i = 1; i <= 100; i++)
                 {
-                    Name = $"Company {i}",
-                    City = $"City {i}",
-                    District = $"District {i}",
-                    Tel = $"Tel {i}",
-                    Email = $"Email {i}",
-                });
+                    _items.Add(new Company
+                        {
+                            Name = $"Company {i}",
+                            City = $"City {city}",
+                            District = $"District {district}",
+                            Tel = $"Tel {i}",
+                            Email = $"Email {i}",
+                        });
+                }
+            }
         }
+        
     }
 }

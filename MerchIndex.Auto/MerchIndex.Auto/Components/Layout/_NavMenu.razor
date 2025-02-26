@@ -25,7 +25,7 @@
 
 <nav class="navbar navbar-expand-lg fixed-top bg-white">
     <div class="container-fluid">
-        <a class="navbar-brand" href="javascript:void(0);">
+        <a class="navbar-brand" href="/">
             <img src="/images/logo.png" alt="">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <NavLink class="nav-link" aria-current="page" href="/"><i class="bi bi-house"></i> Hem</NavLink>
+                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All"><i class="bi bi-house"></i> Hem</NavLink>
                 </li>
 
                 <AuthorizeView>
@@ -56,7 +56,7 @@
                     </Authorized>
                     <NotAuthorized>
                         <li class="nav-item">
-                            <NavLink class="nav-link" aria-current="page" href="products"><i class="bi bi-boxes"></i> Produkter</NavLink>
+                            <NavLink class="nav-link"  href="products"><i class="bi bi-boxes"></i> Produkter</NavLink>
                         </li>
                     </NotAuthorized>
                 </AuthorizeView>
@@ -89,16 +89,16 @@
                     </Authorized>
                     <NotAuthorized>
                         <li class="nav-item">
-                            <NavLink class="nav-link" aria-current="page" href="companies"><i class="bi bi-houses"></i> Företag</NavLink>
+                            <NavLink class="nav-link" href="companies"><i class="bi bi-houses"></i> Företag</NavLink>
                         </li>
                     </NotAuthorized>
                 </AuthorizeView>
 
                 <li class="nav-item">
-                    <NavLink class="nav-link" aria-current="page" href="contact"><i class="bi bi-send"></i> Kontakt</NavLink>
+                    <NavLink class="nav-link" href="contact"><i class="bi bi-send"></i> Kontakt</NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" aria-current="page" href="about"><i class="bi bi-info-square"></i> Om oss</NavLink>
+                    <NavLink class="nav-link" href="about"><i class="bi bi-info-square"></i> Om oss</NavLink>
                 </li>
             </ul>
 
@@ -129,10 +129,10 @@
                 </Authorized>
                 <NotAuthorized>
                     <div class="d-flex mx-1">
-                        <a class="nav-link" href="companyregister"><i class="bi bi-person-plus"></i> Registrera Företag</a>
+                        <NavLink class="nav-link" href="companyregister"><i class="bi bi-person-plus"></i> Registrera Företag</NavLink>
                     </div>
                     <div class="d-flex mx-1">
-                        <a class="nav-link" href="account/Login"><i class="bi bi-box-arrow-in-right"></i> Logga in</a>
+                        <NavLink class="nav-link" href="account/Login"><i class="bi bi-box-arrow-in-right"></i> Logga in</NavLink>
                     </div>
                 </NotAuthorized>
             </AuthorizeView>

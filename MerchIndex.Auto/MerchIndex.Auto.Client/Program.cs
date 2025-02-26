@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MerchIndex.Auto.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using ServiceCollectionExtensions;
+using Persilsoft.Nominatim.Geolocation.Blazor;
+using Persilsoft.Nominatim.Geolocation.Blazor.Geocoding;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -37,5 +40,9 @@ builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticat
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthenticationStateDeserialization();
+
+builder.Services.AddGeolocationService(); // must be added in server side too
+builder.Services.AddNominatimGeocoderService(); // must be added in server side too
+builder.Services.AddSingleton<GeolocationService>();
 
 await builder.Build().RunAsync();
