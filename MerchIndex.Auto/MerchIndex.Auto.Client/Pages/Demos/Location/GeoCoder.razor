@@ -1,0 +1,72 @@
+﻿@page "/wasm/geocoder"
+@using Persilsoft.Nominatim.Geolocation.Blazor
+@using Persilsoft.Nominatim.Geolocation.Blazor.Geocoding
+@inject GeolocationService Geolocation
+@inject IGeocoder GeocoderService
+
+@* https://www.nuget.org/packages/Persilsoft.Nominatim.Geolocation.Blazor#readme-body-tab *@
+
+@rendermode InteractiveWebAssembly
+@attribute [StreamRendering]
+
+<PageTitle>Geolocation Test</PageTitle>
+
+<h1>Geolocation</h1>
+<hr />
+
+<button class="btn btn-primary" @onclick=ShowLocation>
+    Show location
+</button>
+
+<div class="row mt-2">
+    <div class="col-md-6">
+        <label class="form-label">Latitude:</label>
+        <input type="text" class="form-control" @bind=latitude disabled />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Longitude:</label>
+        <input type="text" class="form-control" @bind=longitude disabled />
+    </div>
+    <p>@message</p>
+</div>
+@if (addressSectionVisible)
+{
+    <section>
+        <button class="btn btn-warning" @onclick="GetAddress">
+            Get Address
+        </button>
+        <textarea class="form-control mt-2" @bind="addressDet" disabled>
+            </textarea>
+    </section>
+}
+
+@code {
+    private double latitude;
+    private double longitude;
+    private string message = string.Empty;
+
+    private bool addressSectionVisible;
+    private string addressDet = string.Empty;
+
+    private async Task ShowLocation()
+    {
+        var position = await Geolocation.GetPosition();
+        if (!position.Equals(default))
+        {
+            latitude = position.Latitude;
+            longitude = position.Longitude;
+            addressSectionVisible = true;
+        }
+        else
+        {
+            message = "Location could not be retrieved.";
+            addressSectionVisible = false;
+        }
+    }
+
+    private async Task GetAddress()
+    {
+        var address = await GeocoderService.GetGeocodingAddressAsync(latitude, longitude);
+        addressDet = address.DisplayAddress;
+    }
+}

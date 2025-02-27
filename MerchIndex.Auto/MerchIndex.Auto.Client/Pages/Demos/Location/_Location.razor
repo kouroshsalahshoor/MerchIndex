@@ -1,0 +1,38 @@
+﻿@using Persilsoft.Nominatim.Geolocation.Blazor
+@using Persilsoft.Nominatim.Geolocation.Blazor.Geocoding
+@inject GeolocationService Geolocation
+@inject IGeocoder GeocoderService
+
+@rendermode InteractiveWebAssembly
+@attribute [StreamRendering]
+
+@_address
+
+@code {
+    private double latitude;
+    private double longitude;
+
+    private string _address = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var position = await Geolocation.GetPosition();
+            if (!position.Equals(default))
+            {
+                latitude = position.Latitude;
+                longitude = position.Longitude;
+
+                var address = await GeocoderService.GetGeocodingAddressAsync(latitude, longitude);
+                _address = address.DisplayAddress;
+            }
+            else
+            {
+                _address = "Location could not be retrieved.";
+            }
+
+            StateHasChanged();
+        }
+    }
+}

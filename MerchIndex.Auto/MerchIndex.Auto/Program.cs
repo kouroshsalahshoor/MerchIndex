@@ -11,6 +11,7 @@ using MerchIndex.Auto.Services;
 using MerchIndex.Auto.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ServiceCollectionExtensions;
+using Persilsoft.Nominatim.Geolocation.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,6 +122,7 @@ builder.Services.AddScoped<ExcelService>();
 
 builder.Services.AddGeolocationService();
 builder.Services.AddNominatimGeocoderService();
+builder.Services.AddScoped<GeolocationService>();
 
 var app = builder.Build();
 

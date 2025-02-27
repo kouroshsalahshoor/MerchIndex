@@ -1,0 +1,39 @@
+﻿@page "/location"
+
+@using Persilsoft.Nominatim.Geolocation.Blazor
+@using Persilsoft.Nominatim.Geolocation.Blazor.Geocoding
+
+@inject GeolocationService Geolocation
+@inject IGeocoder GeocoderService
+
+@* @rendermode InteractiveAuto *@
+@rendermode InteractiveWebAssembly
+@attribute [StreamRendering]
+
+@_address
+
+@code {
+    private string? _address = "Okänd";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await setAddress();
+        }
+    }
+    private async Task setAddress()
+    {
+        var position = await Geolocation.GetPosition();
+        if (!position.Equals(default))
+        {
+            var latitude = position.Latitude;
+            var longitude = position.Longitude;
+
+            var address = await GeocoderService.GetGeocodingAddressAsync(latitude, longitude);
+            _address = address.DisplayAddress;
+
+            StateHasChanged();
+        }
+    }
+}

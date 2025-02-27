@@ -105,16 +105,21 @@
             <div class="d-flex" role="search" title="Sök">
                 <div class="form-floating">
                     <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @onkeydown="handleKeyDown">
-                    <label for="floatingInputSearch" class="form-label">Sök</label>
+                    <label for="floatingInputSearch" class="form-label">Sök Produkt</label>
                 </div>
                 <button class="btn btn-warning text-light mx-1" style="width:60px;" @onclick="search"><i class="bi bi-search"></i></button>
             </div>
 
+            <div class="d-flex mx-1">
+                <span class="nav-link">
+                    <span class="bi bi-geo-alt" aria-hidden="true"></span> xxx
+                </span>
+            </div>
             <AuthorizeView>
                 <Authorized>
 
                     <div class="d-flex mx-1">
-                        <a class="nav-link" href="Account/Manage">
+                        <a class="nav-link" href="">
                             <span class="bi bi-person" aria-hidden="true"></span> Välkommen @context.User.Identity?.Name
                         </a>
                     </div>
