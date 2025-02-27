@@ -1,91 +1,120 @@
 ﻿
-<style>
-    .page-item{
-        width: 50px;
+@* <style>
+    .page-item,
+    .page-item button{
+        width: 51px;
         text-align: center;
     }
-</style>
-<nav>
-    <ul class="pagination">
-        <li class="page-item @(_currentPage == 1 ? "disabled" : null)" @onclick="@(() => {_currentPage = 1;})">
-            <a class="page-link" href="javascript:void(0);" title="Första">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        <li class="page-item @(_currentPage == 1 ? "disabled" : null)" @onclick="@(() => {_currentPage = _currentPage >=1 ? _currentPage - 1 : 1;})">
-            <a class="page-link" href="javascript:void(0);" title="Förra">
-                <span aria-hidden="true">&lsaquo;</span>
-            </a>
-        </li>
+</style> *@
+<hr />
+<div class="row">
+    <div class="col">
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(() => page(1))">
+                    <button class="page-link" title="Första"><span aria-hidden="true">&laquo;</span></button>
+                </li>
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(() => page(CurrentPage - 1))">
+                    <button class="page-link" title="Förra"><span aria-hidden="true">&lsaquo;</span></button>
+                </li>
 
-        @if (_totalPages <= ((2 * Radius) + 1))
-        {
-            @for (int i = 1; i <= _totalPages; i++)
-            {
-                <li class="page-item @(_currentPage == i ? "active" : null)"><a class="page-link" href="javascript:void(0);">@i</a></li>
-            }
-        }
-        else
-        {
-            if (_currentPage <= (Radius + 1))
-            {
-                for (int i = 1; i <= ((2 * Radius) + 1); i++)
+                @if (_totalPages <= ((2 * Radius) + 1))
                 {
-                    <li class="page-item @(_currentPage == i ? "active" : null)"><a class="page-link" href="javascript:void(0);">@i</a></li>
+                    @for (int i = 1; i <= _totalPages; i++)
+                    {
+                        {
+                            var index = i;
+                            <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                <button class="page-link">@i</button>
+                            </li>
+                        }
+                    }
                 }
-                <li class="page-item"><span class="page-link"><i class="bi bi-three-dots"></i></span></li>
-
-            }
-            else if ((_currentPage > (Radius + 1)) && _currentPage <= (_totalPages - (Radius + 1)))
-            {
-                <li class="page-item"><span class="page-link"><i class="bi bi-three-dots"></i></span></li>
-
-                for (int i = _currentPage - Radius; i <= _currentPage + Radius; i++)
+                else
                 {
-                    <li class="page-item @(_currentPage == i ? "active" : null)"><a class="page-link" href="javascript:void(0);">@i</a></li>
-                }
-                <li class="page-item"><span class="page-link"><i class="bi bi-three-dots"></i></span></li>
-            }
-            else
-            {
-                <li class="page-item"><span class="page-link"><i class="bi bi-three-dots"></i></span></li>
+                    if (CurrentPage <= (Radius + 1))
+                    {
+                        for (int i = 1; i <= ((2 * Radius) + 1); i++)
+                        {
+                            {
+                                var index = i;
+                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                    <button class="page-link">@i</button>
+                                </li>
+                            }
+                        }
+                        <li class="page-item" @onclick="@(() => page((2 * Radius) + 2))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
 
-                for (int i = _totalPages - (2 * Radius) ; i <= _totalPages; i++)
-                {
-                    <li class="page-item @(_currentPage == i ? "active" : null)"><a class="page-link" href="javascript:void(0);">@i</a></li>
-                }
-            }
-        }
+                    }
+                    else if ((CurrentPage > (Radius + 1)) && CurrentPage <= (_totalPages - (Radius + 1)))
+                    {
+                        <li class="page-item" @onclick="@(() => page((CurrentPage - Radius) - 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
 
-        <li class="page-item @(_currentPage == _totalPages ? "disabled" : null)" @onclick="@(() => {_currentPage = _currentPage < _totalPages ? _currentPage + 1 : _totalPages;})">
-            <a class="page-link" href="javascript:void(0);" title="Nästa">
-                <span aria-hidden="true">&rsaquo;</span>
-            </a>
-        </li>
-        <li class="page-item" @onclick="@(() => {_currentPage = _totalPages;})">
-            <a class="page-link @(_currentPage == _totalPages ? "disabled" : null)" href="javascript:void(0);" title="Sista">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+                        for (int i = CurrentPage - Radius; i <= CurrentPage + Radius; i++)
+                        {
+                            {
+                                var index = i;
+                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                    <button class="page-link">@i</button>
+                                </li>
+                            }
+                        }
+                        <li class="page-item" @onclick="@(() => page((CurrentPage + Radius) + 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
+                    }
+                    else
+                    {
+                        <li class="page-item" @onclick="@(() => page((_totalPages - (2 * Radius)) - 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
+                        for (int i = _totalPages - (2 * Radius); i <= _totalPages; i++)
+                        {
+                            {
+                                var index = i;
+                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                    <button class="page-link">@i</button>
+                                </li>
+                            }
+                        }
+                    }
+                }
+
+                <li class="page-item @(CurrentPage == _totalPages ? "disabled" : null)" @onclick="@(() => page(CurrentPage + 1))">
+                    <button class="page-link" title="Nästa"><span aria-hidden="true">&rsaquo;</span></button>
+                </li>
+                <li class="page-item" @onclick="@(() => page(_totalPages))">
+                    <button class="page-link @(CurrentPage == _totalPages ? "disabled" : null)" title="Sista"><span aria-hidden="true">&raquo;</span></button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="col text-end">
+        <span class="text-muted">
+            Sida @CurrentPage av @_totalPages -
+            Visar
+            @(((CurrentPage - 1) * ItemsPerPage) + 1)  -
+            @(CurrentPage == _totalPages ? (((CurrentPage - 1) * ItemsPerPage) + (TotalItems % ItemsPerPage)) : (((CurrentPage - 1) * ItemsPerPage) + ItemsPerPage))
+            (av @TotalItems träffar)
+        </span>
+    </div>
+</div>
 
 @code {
     [Parameter] public int TotalItems { get; set; } = 1;
-    [Parameter] public int Radius { get; set; }
-    private int _itemsPerPage = 100;
-    private int _currentPage = 1;
+    [Parameter] public int Radius { get; set; } = 3;
+    [Parameter] public int ItemsPerPage { get; set; } = 100;
+    [Parameter] public int CurrentPage { get; set; } = 1;
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
     private int _totalPages = 1;
-    // private int _radius = 3;
 
     protected override void OnParametersSet()
     {
-        Radius = 3;
-        _totalPages = (int)Math.Ceiling(TotalItems / (double)_itemsPerPage);
+        _totalPages = (int)Math.Ceiling(TotalItems / (double)ItemsPerPage);
     }
 
-    private void next()
+    private void page(int page)
     {
-        _currentPage++;
+        CurrentPage = page < 1 ? 1 : page;
+        CurrentPage = page > _totalPages ? _totalPages : page;
+
+        OnPageChanged.InvokeAsync(CurrentPage);
     }
 }
