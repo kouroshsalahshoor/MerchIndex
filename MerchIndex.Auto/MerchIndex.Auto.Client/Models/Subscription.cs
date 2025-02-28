@@ -2,10 +2,11 @@
 
 namespace MerchIndex.Auto.Client.Models
 {
-    public class Category
+    public class Subscription
     {
         public int Id { get; set; }
         [Required(ErrorMessage = "Fyll i {0}")]
-        public string Name { get; set; } = default!;
+        [EmailAddress(ErrorMessage = "Fyll i en giltig e-postadress")]
+        public string Email { get; set; } = string.Empty;
     }
 }

@@ -6,10 +6,13 @@
         public const string Role_CompanyAdmins = "CompanyAdmins";
         public const string Role_Users = "Users";
 
-        public const string DeleteText = "Are you sure you want to delete this item?";
-        public const string SameNameText = "There is another item with the same name";
+        public const string DeleteText = "Är du säker på att du vill ta bort det här objektet?";
+        public const string SameNameText = "Det finns ett annat objekt med samma namn.";
+        public const string SameEmailText = "Emailet är redan registrerat.";
 
-        public const string SaveErrorText = "Error saving data";
+        public const string SaveErrorText = "Fel vid sparande av data";
+
+        public const string SaveSuccess = "Spara data lyckades.";
         
     }
 }

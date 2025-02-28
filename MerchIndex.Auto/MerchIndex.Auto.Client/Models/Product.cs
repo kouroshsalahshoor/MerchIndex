@@ -6,15 +6,15 @@ namespace MerchIndex.Auto.Client.Models
     public class Product
     {
         public long? Id { get; set; }
-        [Required(ErrorMessage = "Fyll in {0}")]
+        [Required(ErrorMessage = "Fyll i {0}")]
         public string Name { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Fyll in {0}")]
+        [Required(ErrorMessage = "Fyll i {0}")]
         public string Description { get; set; } = string.Empty;
         [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Fyll in en positiv {0}")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Fyll i en positiv {0}")]
         [Column(TypeName = "decimal(8, 2)")]
         public decimal Price { get; set; }
-        [Required(ErrorMessage = "Fyll in {0}")]
+        [Required(ErrorMessage = "Fyll i {0}")]
         public string Category { get; set; } = string.Empty;
         public string? Tag { get; set; }
         public string? Manifacturer { get; set; }

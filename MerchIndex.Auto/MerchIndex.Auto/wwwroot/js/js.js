@@ -6,7 +6,7 @@
         toastr.error(message);
     }
     if (type === "warning") {
-        toastr.error(message);
+        toastr.warning(message);
     }
     if (type === "info") {
         toastr.error(message);

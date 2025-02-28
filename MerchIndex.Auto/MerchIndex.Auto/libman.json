@@ -9,6 +9,14 @@
     {
       "library": "font-awesome-animation@1.1.0",
       "destination": "wwwroot/lib/font-awesome-animation/"
+    },
+    {
+      "library": "toastr.js@2.1.4",
+      "destination": "wwwroot/lib/toastr/"
+    },
+    {
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/lib/jquery/"
     }
   ]
 }

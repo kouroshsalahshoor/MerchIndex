@@ -1,0 +1,77 @@
+﻿@rendermode InteractiveServer
+
+@if (_model is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <form>
+        <h5>Prenumerera</h5>
+        <p>Få de allra senaste och mest spännande produkter från oss.</p>
+        <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+            <label for="newsletter1" class="visually-hidden">Email</label>
+
+            <EditForm method="post" Model="_model" OnValidSubmit="submit" FormName="create" Enhance>
+                <DataAnnotationsValidator />
+                @* <ValidationSummary class="text-danger" role="alert" /> *@
+
+                <_errors Items="@_errors" />
+
+                <div class="row g-1">
+                    <div class="col-auto">
+                        <InputText typeo="email" @bind-Value="_model.Email" class="form-control" placeholder="" />
+                        <ValidationMessage For="() => _model.Email" class="text-danger" />
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Prenumerera</button>
+                    </div>
+                </div>
+
+@*                 <InputText typeo="email" @bind-Value="_model.Email" class="form-control" placeholder="" />
+                <ValidationMessage For="() => _model.Email" class="text-danger" />
+
+                <button class="btn btn-primary" type="button">Prenumerera</button> *@
+
+            </EditForm>
+
+        </div>
+    </form>
+}
+
+@code {
+    private ApplicationDbContext _db => Service;
+
+    [SupplyParameterFromForm]
+    private Subscription? _model { get; set; } = new();
+
+    private List<string> _errors = new();
+
+    private async Task submit()
+    {
+        _errors.Clear();
+
+        if (await _db.Subscriptions.AnyAsync(x => x.Email == _model!.Email))
+        {
+            _errors.Add(Constants.SameEmailText);
+            return;
+        }
+
+        _db.Subscriptions.Add(_model!);
+
+        try
+        {
+            await _db.SaveChangesAsync();
+
+            _model = new();
+            await _js.ToastrSuccess(Constants.SaveSuccess);
+            StateHasChanged();
+        }
+        catch (DbUpdateConcurrencyException e)
+        {
+            _errors.Add(Constants.SaveErrorText);
+            _errors.Add(e.Message);
+        }
+
+    }
+}

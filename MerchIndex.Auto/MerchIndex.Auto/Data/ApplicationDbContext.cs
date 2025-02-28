@@ -15,6 +15,7 @@ namespace MerchIndex.Auto.Data
         public DbSet<Location> Locations => Set<Location>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Company> Companies => Set<Company>();
+        public DbSet<Subscription> Subscriptions => Set<Subscription>();
 
         override protected void OnModelCreating(ModelBuilder builder)
         {
