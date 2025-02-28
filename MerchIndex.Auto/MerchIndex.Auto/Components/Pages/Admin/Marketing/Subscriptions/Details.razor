@@ -1,0 +1,48 @@
+﻿@page "/admin/category/{id:int}"
+
+@* @attribute [Authorize] *@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<div>
+    @if (_model is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Id</dt>
+            <dd class="col-sm-10">@_model.Id</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@_model.Name</dd>
+        </dl>
+        <div>
+            <a class="btn btn-warning" href="@($"/admin/category/update/{_model.Id}")">Edit</a>
+            <a class="btn btn-light" href="@($"/admin/categories")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private string _title = "Details";
+    private Category? _model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var db = _dbFactory.CreateDbContext();
+        _model = await db.Categories.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (_model is null)
+        {
+            _navigationManager.NavigateTo("notfound");
+        }
+    }
+}

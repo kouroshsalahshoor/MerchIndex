@@ -26,6 +26,12 @@
     font-weight: bold;
 }
 
+td.zero_width {
+    width: 1%;
+    white-space: nowrap;
+}
+
+
 /*
 input, .shop.login .form .form-group input {
     border: 1px solid #e6e2f5;

@@ -1,0 +1,77 @@
+﻿@page "/admin/Subscriptions"
+@* @implements IAsyncDisposable *@
+
+@* @attribute [Authorize] *@
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<style>
+    tbody, td, tfoot, th, thead, tr {
+        border-style: none;
+    }
+</style>
+
+<PageTitle>@_title</PageTitle>
+
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<p class="container">
+    <div class="input-group mb-3">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="search" placeholder="" @bind="_filter" @bind:event="oninput">
+            <label for="search">Search</label>
+        </div>
+        <span class="input-group-text bg-warning text-light px-3"><i class="bi bi-search"></i></span>
+    </div>
+</p>
+
+@* <QuickGrid Class="table table-striped table-hover" Items="_db.Subscriptions" Pagination="_pagination"> *@
+<QuickGrid Class="table" Items="_filteredItems" Pagination="_pagination">
+    <PropertyColumn Property="x => x.Email" Sortable="true" />
+
+    <TemplateColumn Context="item" Class="text-center zero_width">
+        <HeaderTemplate><a class="btn btn-sm btn-primary mx-auto" href="admin/Subscription/create" title="Create"><i class="bi bi-plus-square"></i></a></HeaderTemplate>
+        <ChildContent>
+            <a class="btn btn-sm btn-warning" href="@($"admin/Subscription/update/{item.Id}")" title="Update"><i class="bi bi-pencil-square"></i></a>
+            <a class="btn btn-sm btn-info" href="@($"admin/Subscription/{item.Id}")" title="Details"><i class="bi bi-info-square"></i></a>
+            <button class="btn btn-sm btn-danger" @onclick="@(async() => await delete(item))" title="Delete"><i class="bi bi-trash"></i></button>
+        </ChildContent>
+    </TemplateColumn>
+</QuickGrid>
+<Paginator State="_pagination" />
+
+@code {
+    private ApplicationDbContext _db => Service;
+    private string _title = "Subscriptions";
+
+    private string _filter = string.Empty;
+    private IQueryable<Subscription> _filteredItems = default!;
+    // private IQueryable<Subscription> _filteredItems => _db.Subscriptions.Where(m => m.Name!.Contains(_filter)).OrderByDescending(x => x.Id);
+    private PaginationState _pagination = new PaginationState { ItemsPerPage = 100 };
+
+    protected override async void OnInitialized()
+    {
+        await load();
+    }
+
+    private async Task load()
+    {
+        _filteredItems = _db.Subscriptions.Where(m => m.Email!.Contains(_filter)).OrderByDescending(x => x.Id);
+    }
+
+    private async ValueTask delete(Subscription model)
+    {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
+            if (model is not null)
+            {
+                _db.Subscriptions.Remove(model);
+                await _db.SaveChangesAsync();
+
+                await _js.ToastrSuccess("Deleted successfully");
+
+                await load();
+            }
+        }
+    }
+}
