@@ -135,12 +135,12 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-12">
             <button type="submit" class="btn btn-primary w-100">Spara</button>
         </div>
     </EditForm>
-</div> 
+</div>
 
 @if (_loading)
 {
@@ -171,20 +171,29 @@
         _loading = true;
         StateHasChanged();
 
+        _errors.Clear();
+        ReturnUrl = ReturnUrl ?? "/account/login";
+
+        await save();
+
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task save()
+    {
+        //check if company name already exists
         if (await _db.Companies.AnyAsync(x => x.Name == Input.CompanyName))
         {
             _errors.Add(Constants.SameNameText);
-            return;
         }
 
         // https://learn.microsoft.com/en-us/ef/core/saving/transactions
         using var transaction = await _db.Database.BeginTransactionAsync();
 
-        _errors.Clear();
-        ReturnUrl = ReturnUrl ?? "/account/login";
-
         try
         {
+            // create user email as username
             var user = CreateUser();
 
             await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -205,6 +214,7 @@
             }
             Logger.LogInformation("User created a new account with password.");
 
+            //create roles if not exist
             if (await RoleManager.Roles.AnyAsync(x => x.Name == Constants.Role_CompanyAdmins) == false)
             {
                 await RoleManager.CreateAsync(new IdentityRole(Constants.Role_Users));
@@ -212,6 +222,7 @@
                 await RoleManager.CreateAsync(new IdentityRole(Constants.Role_Admins));
             }
 
+            //add user to role
             result = await UserManager.AddToRoleAsync(user, Constants.Role_CompanyAdmins);
             if (!result.Succeeded)
             {
@@ -247,12 +258,14 @@
             // when disposed if either commands fails
             await transaction.CommitAsync();
 
+            //upload images
             if (_uploadingFiles is not null && _uploadingFiles!.Any())
             {
                 _imageService.DeleteAll(_parentDirName, company.Id.ToString());
                 await _imageService.UploadFiles(_parentDirName, company.Id.ToString(), _uploadingFiles!);
             }
 
+            //send email confirmation
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var callbackUrl = NavigationManager.GetUriWithQueryParameters(
@@ -284,9 +297,6 @@
 
             await _js.ToastrError("Error: Company Registeration failed!");
         }
-
-        _loading = false;
-        StateHasChanged();
     }
 
     private ApplicationUser CreateUser()

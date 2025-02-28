@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MerchIndex.Auto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250228101707_Subscriptions")]
-    partial class Subscriptions
+    [Migration("20250228195836_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

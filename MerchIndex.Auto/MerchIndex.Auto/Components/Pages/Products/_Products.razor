@@ -110,6 +110,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         _query = _db.Products
             .AsNoTracking()
             .AsQueryable();
@@ -139,7 +140,7 @@
                     x.Name.ToLower().Contains(_searchTerm) ||
                     x.Price.ToString().Contains(_searchTerm) ||
                    x.Category.ToLower().Contains(_searchTerm)
-                )  &&
+                ) &&
                 (string.IsNullOrEmpty(_selectedCategory) || x.Category == _selectedCategory) &&
                 (string.IsNullOrEmpty(_selectedManifacturer) || x.Manifacturer == _selectedManifacturer)
             )

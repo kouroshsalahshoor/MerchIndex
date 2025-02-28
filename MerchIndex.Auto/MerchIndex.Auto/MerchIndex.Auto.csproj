@@ -14,6 +14,7 @@
     <Compile Remove="Components\Pages\Admin\Product\CRUD\**" />
     <Compile Remove="Components\Pages\Admin\Product\x\**" />
     <Compile Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <Compile Remove="Components\Pages\Products\x\**" />
     <Compile Remove="Components\XHome\**" />
     <Content Remove="Components\Pages\Account\**" />
     <Content Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
@@ -21,6 +22,7 @@
     <Content Remove="Components\Pages\Admin\Product\CRUD\**" />
     <Content Remove="Components\Pages\Admin\Product\x\**" />
     <Content Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <Content Remove="Components\Pages\Products\x\**" />
     <Content Remove="Components\XHome\**" />
     <EmbeddedResource Remove="Components\Pages\Account\**" />
     <EmbeddedResource Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
@@ -28,6 +30,7 @@
     <EmbeddedResource Remove="Components\Pages\Admin\Product\CRUD\**" />
     <EmbeddedResource Remove="Components\Pages\Admin\Product\x\**" />
     <EmbeddedResource Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <EmbeddedResource Remove="Components\Pages\Products\x\**" />
     <EmbeddedResource Remove="Components\XHome\**" />
     <None Remove="Components\Pages\Account\**" />
     <None Remove="Components\Pages\Admin\Categories\CategoryPages\**" />
@@ -35,6 +38,7 @@
     <None Remove="Components\Pages\Admin\Product\CRUD\**" />
     <None Remove="Components\Pages\Admin\Product\x\**" />
     <None Remove="Components\Pages\Admin\Product\_CRUD\**" />
+    <None Remove="Components\Pages\Products\x\**" />
     <None Remove="Components\XHome\**" />
   </ItemGroup>
 
@@ -84,6 +88,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.103.7.1" />
   </ItemGroup>
 
   <ItemGroup>
