@@ -37,19 +37,20 @@
                     <NavLink class="nav-link" href="/" Match="NavLinkMatch.All"><i class="bi bi-house"></i> Hem</NavLink>
                 </li>
 
-                <AuthorizeView>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="products"><i class="bi bi-boxes"></i> Produkter</NavLink>
+                </li>
+
+                <AuthorizeView Roles="@Constants.Role_CompanyAdmins">
                     <Authorized>
                         @if (_currentUser.IsInRole(Constants.Role_CompanyAdmins))
                         {
                             <li class="nav-item">
-                                <NavLink class="nav-link" href="admin/products"><i class="bi bi-boxes"></i> Produkter</NavLink>
+                                <NavLink class="nav-link" href="admin/products"><i class="bi bi-boxes"></i> Företagets Produkter</NavLink>
                             </li>
                         }
                     </Authorized>
                     <NotAuthorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="products"><i class="bi bi-boxes"></i> Produkter</NavLink>
-                        </li>
                     </NotAuthorized>
                 </AuthorizeView>
 
@@ -101,7 +102,7 @@
                 </AuthorizeView>
 
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="contact"><i class="bi bi-send"></i> Kontakt</NavLink>
+                    <NavLink class="nav-link" href="contact"><i class="bi bi-headset"></i> Kontakt</NavLink>
                 </li>
                 <li class="nav-item">
                     <NavLink class="nav-link" href="about"><i class="bi bi-info-square"></i> Om oss</NavLink>
@@ -110,7 +111,7 @@
 
             <div class="d-flex me-auto" role="search" title="Sök">
                 <div class="form-floating">
-                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @onkeydown="handleKeyDown" style="width:400px;">
+                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @onkeydown="handleKeyDown" style="width:280px;">
                     <label for="floatingInputSearch" class="form-label">Sök Produkt</label>
                 </div>
                 <button class="btn btn-warning text-light mx-1" style="width:60px;" @onclick="search"><i class="bi bi-search"></i></button>
