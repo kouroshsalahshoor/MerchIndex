@@ -28,7 +28,7 @@
                 <hr />
             </div>
 
-            <StatusMessage Message="@errorMessage" />
+            <StatusMessage Message="@_errorMessage" />
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
@@ -90,7 +90,7 @@
     private ApplicationDbContext _db => Service;
 
     private string _title = "Logga in";
-    private string? errorMessage;
+    private string? _errorMessage;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -112,6 +112,8 @@
 
     public async Task LoginUser()
     {
+        _errorMessage = string.Empty;
+
         // This doesn't count login failures towards account lockout
         // To enable password failures to trigger account lockout, set lockoutOnFailure: true
         var result = await SignInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
@@ -130,11 +132,11 @@
             }
             else if (await _userManager.IsInRoleAsync(user!, Constants.Role_CompanyAdmins))
             {
-                var company = await _db.Companies.FirstOrDefaultAsync(x => x.Name == Input.UserName);
-                // var company = await _db.Companies.FirstOrDefaultAsync(x => x.Email == Input.UserName);
+                var company = await _db.Companies.FirstOrDefaultAsync(x => x.Email == Input.UserName);
                 if (company is null)
                 {
                     await SignInManager.SignOutAsync();
+                    _errorMessage = "Inget företag hittades!";
                 }
                 else
                 {
@@ -166,7 +168,7 @@
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            _errorMessage = "Error: Invalid login attempt.";
         }
     }
 

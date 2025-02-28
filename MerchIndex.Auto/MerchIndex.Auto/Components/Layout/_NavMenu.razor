@@ -39,6 +39,22 @@
 
                 <AuthorizeView>
                     <Authorized>
+                        @if (_currentUser.IsInRole(Constants.Role_CompanyAdmins))
+                        {
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="admin/products"><i class="bi bi-boxes"></i> Produkter</NavLink>
+                            </li>
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="products"><i class="bi bi-boxes"></i> Produkter</NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+                <AuthorizeView Roles="@Constants.Role_Admins">
+                    <Authorized>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Produkter
@@ -53,16 +69,6 @@
                                 }
                             </ul>
                         </li>
-                    </Authorized>
-                    <NotAuthorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link"  href="products"><i class="bi bi-boxes"></i> Produkter</NavLink>
-                        </li>
-                    </NotAuthorized>
-                </AuthorizeView>
-
-                <AuthorizeView Roles="@Constants.Role_Admins">
-                    <Authorized>
 
                         <li class="nav-item">
                             <NavLink class="nav-link" href="admin/companies">
@@ -102,19 +108,19 @@
                 </li>
             </ul>
 
-            <div class="d-flex" role="search" title="Sök">
+            <div class="d-flex me-auto" role="search" title="Sök">
                 <div class="form-floating">
-                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @onkeydown="handleKeyDown">
+                    <input class="form-control" id="floatingInputSearch" placeholder="" @bind-value="@_searchTerm" @onkeydown="handleKeyDown" style="width:400px;">
                     <label for="floatingInputSearch" class="form-label">Sök Produkt</label>
                 </div>
                 <button class="btn btn-warning text-light mx-1" style="width:60px;" @onclick="search"><i class="bi bi-search"></i></button>
             </div>
 
-            <div class="d-flex mx-1">
+            @* <div class="d-flex mx-1">
                 <span class="nav-link">
                     <span class="bi bi-geo-alt" aria-hidden="true"></span> xxx
                 </span>
-            </div>
+            </div> *@
             <AuthorizeView>
                 <Authorized>
 
