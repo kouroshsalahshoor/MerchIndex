@@ -5,11 +5,11 @@
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 
-@* <style>
+<style>
     tbody, td, tfoot, th, thead, tr {
         border-style: none;
     }
-</style> *@
+</style>
 
 <PageTitle>@_title</PageTitle>
 
@@ -44,7 +44,7 @@
 </div>
 
 @* <QuickGrid Class="table table-striped table-hover" Items="_db.Subscriptions" Pagination="_pagination"> *@
-<QuickGrid Class="table table-striped table-hover" Items="_filteredItems" Pagination="_pagination">
+<QuickGrid Class="table" Items="_filteredItems" Pagination="_pagination">
     <PropertyColumn Property="x => x.Email" Sortable="true" />
 
     <TemplateColumn Context="item" Class="text-center zero_width">

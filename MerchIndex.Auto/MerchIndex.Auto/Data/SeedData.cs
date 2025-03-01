@@ -2,6 +2,7 @@
 using MerchIndex.Auto.Client.Models;
 using static System.Net.Mime.MediaTypeNames;
 using System;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace MerchIndex.Auto.Data
 {
@@ -9,61 +10,64 @@ namespace MerchIndex.Auto.Data
     {
         public static void EnsurePopulated(ApplicationDbContext context)
         {
+            Random rnd = new Random();
+
             if (context.Database.GetPendingMigrations().Any())
             {
                 context.Database.Migrate();
             }
 
-            var email = "kourosh23@hotmail.com";
-
             if (!context.Companies.Any())
             {
-                var admin = context.Users.FirstOrDefault(x => x.Email == email);
-
-                context.Companies.AddRange(
-                new Company
+                for (int i = 1; i <= 10; i++)
                 {
-                    Name = "1",
-                    ActiveOn = DateTime.Now,
-                    Address = "1",
-                    BusinessArea = "1",
-                    City = "1",
-                    District = "1",
-                    Email = "kourosh23@hotmail.com",
-                    Tel = "1",
-                    IsActive = true,
-                    HasBeenActivated = true,
-                    AdminId = admin!.Id
-                });
+                    var email = $"{i.ToString()}@{i.ToString()}.{i.ToString()}";
+                    var companyUser = context.Users.FirstOrDefault(x => x.Email == email);
+
+                    context.Companies.AddRange(
+                    new Company
+                    {
+                        Name = $"Company {i.ToString()}",
+                        ActiveOn = DateTime.Now,
+                        Address = $"Address Company {i.ToString()}",
+                        BusinessArea = $"Business Area {rnd.Next(1, 3 + 1)}",
+                        City = $"City {rnd.Next(1, 3 + 1)}",
+                        District = $"District {rnd.Next(1, 3 + 1)}",
+                        Email = email,
+                        Tel = $"Tel Company {i.ToString()}",
+                        IsActive = true,
+                        HasBeenActivated = true,
+                        AdminId = companyUser!.Id
+                    });
+                }
             }
 
             if (!context.Products.Any())
             {
-                var company = context.Companies.FirstOrDefault(x => x.Email == email);
+                //double randomDouble = rnd.NextDouble() * (100 - 1) + 1; // Generates a random double between 1.0 and 100.0
 
-                Random rnd = new Random();
-                int nbr = rnd.Next(1, 11);  // creates a number between 1 and 10
-                double randomDouble = rnd.NextDouble() * (100 - 1) + 1; // Generates a random double between 1.0 and 100.0
-
-                //for (int i = 1; i <= 10000; i++)
-                for (int i = 1; i <= 1000; i++)
+                for (int c = 1; c <= 10; c++)
                 {
-                    nbr = rnd.Next(1, 11);
-                    randomDouble = rnd.NextDouble() * (100 - 1) + 1;
+                    var company = context.Companies.FirstOrDefault(x => x.Email == $"{c.ToString()}@{c.ToString()}.{c.ToString()}");
 
-                    context.Products.Add(
-                    new Product
+                    for (int i = 1; i <= 1000; i++)
                     {
-                        Name = "Product " + i.ToString(),
-                        Description = "Description " + i.ToString(),
-                        Category = "Category " + nbr,
-                        Price = (decimal)randomDouble,
-                        CompanyId = 1,
-                        Company = company!,
-                        Tag = "Tag " + nbr,
-                        ImageUrl = $"images/demo/{nbr}.jpg"
-                    });
+                        context.Products.Add(
+                        new Product
+                        {
+                            Name = $"Company {c.ToString()} Product {i.ToString()}",
+                            Description = $"Description for Product {i.ToString()}",
+                            Category = $"Category {rnd.Next(1, 10 + 1).ToString()}",
+                            Manifacturer = $"Manifacturer {rnd.Next(1, 3 + 1).ToString()}",
+                            Price = (decimal)((rnd.NextDouble() * (10000 - 1)) + 1),
+                            CompanyId = c,
+                            Company = company!,
+                            Tag = $"Tag {rnd.Next(1, 10 + 1).ToString()}",
+                            ImageUrl = $"images/demo/{rnd.Next(1, 12 + 1).ToString()}.jpg"
+                        });
+                    }
                 }
+
                 context.SaveChanges();
             }
         }

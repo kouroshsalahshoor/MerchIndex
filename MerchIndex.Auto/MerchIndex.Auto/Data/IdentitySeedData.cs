@@ -12,8 +12,14 @@ namespace MerchIndex.Auto.Data
             //UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             //RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
+            //one admin
             CreateAdminAccountAsync(serviceProvider, configuration).Wait();
-            CreateCompanyAccountAsync(serviceProvider, configuration).Wait();
+
+            //10 company accounts
+            for (int i = 1; i <= 10; i++)
+            {
+                CreateCompanyAccountAsync(serviceProvider, configuration, $"{i.ToString()}@{i.ToString()}.{i.ToString()}").Wait();
+            }
         }
         public static async Task CreateAdminAccountAsync(IServiceProvider serviceProvider, IConfiguration configuration)
         {
@@ -46,21 +52,20 @@ namespace MerchIndex.Auto.Data
                 }
             }
         }
-        public static async Task CreateCompanyAccountAsync(IServiceProvider serviceProvider, IConfiguration configuration)
+        public static async Task CreateCompanyAccountAsync(IServiceProvider serviceProvider, IConfiguration configuration, string email)
         {
             serviceProvider = serviceProvider.CreateScope().ServiceProvider;
             UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            var name = "1";
-            var email = "kourosh23@hotmail.com";
+            //var email = "kourosh23@hotmail.com";
             var password = "1";
 
-            if (await userManager.FindByNameAsync(name) == null)
+            if (await userManager.FindByNameAsync(email) == null)
             {
                 ApplicationUser user = new ApplicationUser
                 {
-                    UserName = name,
+                    UserName = email,
                     Email = email
                 };
                 IdentityResult result = await userManager.CreateAsync(user, password);
