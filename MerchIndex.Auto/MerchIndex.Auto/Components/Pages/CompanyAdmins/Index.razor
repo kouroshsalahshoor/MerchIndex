@@ -1,0 +1,151 @@
+﻿@page "/companyadmins"
+
+<style>
+    /* feature.css */
+     .feature-icon {
+        width: 4rem;
+        height: 4rem;
+        border-radius: .75rem;
+    }
+
+    .icon-square {
+        width: 3rem;
+        height: 3rem;
+        border-radius: .75rem;
+    }
+    /*
+    .text-shadow-1 {
+        text-shadow: 0 .125rem .25rem rgba(0, 0, 0, .25);
+    }
+
+    .text-shadow-2 {
+        text-shadow: 0 .25rem .5rem rgba(0, 0, 0, .25);
+    }
+
+    .text-shadow-3 {
+        text-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .25);
+    }
+
+    .card-cover {
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+    }
+
+    .feature-icon-small {
+        width: 3rem;
+        height: 3rem;
+    } */
+</style>
+
+<div class="container px-4 py-5" id="featured-3">
+    <h2 class="pb-2 border-bottom">Company Admin Dashboard</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-collection" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+@*             <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p> *@
+        </div>
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-person-circle" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+        </div>
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-toggles2" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+        </div>
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-tools" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+        </div>
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-house-door" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+        </div>
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-gear-fill" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+        </div>
+
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+                <i class="bi bi-grid-fill" style="font-size:32px;"></i>
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Featured title</h3>
+        </div>
+
+    </div>
+</div>
+
+<div class="row my-5">
+    <div class="col-md-4 offset-4">
+        <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary">
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Email address</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Password</label>
+            </div>
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" value="remember-me"> Remember me
+                </label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+            <hr class="my-4">
+            <small class="text-body-secondary">By clicking Sign up, you agree to the terms of use.</small>
+        </form>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-5">
+        <button type="button" class="position-absolute top-0 end-0 p-3 m-3 btn-close bg-secondary bg-opacity-10 rounded-pill" aria-label="Close"></button>
+        <i class="bi bi-check2-circle fw-bold" style="font-size:48px;"></i>
+        <i class="bi bi-speedometer2"></i>
+        <i class="bi bi-wrench-adjustable"></i>
+        <i class="bi bi-table"></i>
+
+        <div class="input-group">
+            <span class="input-group-text" id="basic-addon1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wrench-adjustable" viewBox="0 0 16 16">
+                    <path d="M16 4.5a4.5 4.5 0 0 1-1.703 3.526L13 5l2.959-1.11q.04.3.041.61"></path>
+                    <path d="M11.5 9c.653 0 1.273-.139 1.833-.39L12 5.5 11 3l3.826-1.53A4.5 4.5 0 0 0 7.29 6.092l-6.116 5.096a2.583 2.583 0 1 0 3.638 3.638L9.908 8.71A4.5 4.5 0 0 0 11.5 9m-1.292-4.361-.596.893.809-.27a.25.25 0 0 1 .287.377l-.596.893.809-.27.158.475-1.5.5a.25.25 0 0 1-.287-.376l.596-.893-.809.27a.25.25 0 0 1-.287-.377l.596-.893-.809.27-.158-.475 1.5-.5a.25.25 0 0 1 .287.376M3 14a1 1 0 1 1 0-2 1 1 0 0 1 0 2"></path>
+                </svg>
+            </span>
+            <input type="text" class="form-control" placeholder="Input group example" aria-label="Input group example" aria-describedby="basic-addon1">
+        </div>
+
+        <h1 class="text-body-emphasis">Placeholder jumbotron</h1>
+        <p class="col-lg-6 mx-auto mb-4">
+            This faded back jumbotron is useful for placeholder content. It's also a great way to add a bit of context to a page or section when no content is available and to encourage visitors to take a specific action.
+        </p>
+        <button class="btn btn-primary px-5 mb-5" type="button">
+            Call to action
+        </button>
+    </div>
+</div>
+
+@code {
+
+}
