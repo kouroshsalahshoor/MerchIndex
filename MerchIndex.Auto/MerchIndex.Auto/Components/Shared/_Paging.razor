@@ -8,7 +8,7 @@
 </style> *@
 <hr />
 <div class="row">
-    <div class="col">
+    <div class="col-sm-12 col-md-6">
         <nav>
             <ul class="pagination">
                 <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(() => page(1))">
@@ -85,7 +85,7 @@
             </ul>
         </nav>
     </div>
-    <div class="col text-end">
+    <div class="col-sm-12 col-md-6 text-end">
         <span class="text-muted">
             Sida @CurrentPage av @_totalPages -
             Visar
@@ -98,8 +98,8 @@
 
 @code {
     [Parameter] public int TotalItems { get; set; } = 1;
-    [Parameter] public int Radius { get; set; } = 3;
-    [Parameter] public int ItemsPerPage { get; set; } = 100;
+    [Parameter] public int Radius { get; set; } = 1;
+    [Parameter] public int ItemsPerPage { get; set; } = 100; //pageSize
     [Parameter] public int CurrentPage { get; set; } = 1;
     [Parameter] public EventCallback<int> OnPageChanged { get; set; }
 

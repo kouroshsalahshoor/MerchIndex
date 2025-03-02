@@ -9,60 +9,15 @@
     </div>
 }
 
-
-<div class="row g-5">
-    <div class="col-md-8">
-        <h3 class="pb-4 mb-4 fst-italic border-bottom">
-            From the Firehose
-        </h3>
-
-        @* products *@
-        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
-
-            @foreach (var item in _items)
-            {
-                <div class="col my-3">
-                    <div class="card shadow-sm">
-                        <img class="bd-placeholder-img card-img-top" src="@item.ImageUrl" />
-                        <div class="card-body text-center">
-                            <p class="card-text fw-bold">@item.Name</p>
-                            <p class="card-text"><strong>@item.Price.ToString("c")</strong></p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                @* <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-primary">View</button>
-                        </div> *@
-                                <small class="text-body-secondary">@item.Company.Name</small>
-                                <small class="text-body-secondary">@item.Category</small>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-body-secondary">@item.Company.City</small>
-                                <small class="text-body-secondary">@item.Company.District</small>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-body-secondary">@item.Manifacturer</small>
-                                <small class="text-body-secondary"></small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-
-        @* <nav class="blog-pagination" aria-label="Pagination">
-            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
-            <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
-        </nav> *@
-
-    </div>
-
+<div class="row g-2">
     <div class="col-md-4">
         <div class="position-sticky" style="top: 2rem;">
-            
+
             <div class="p-4">
                 <h4 class="fst-italic"><strong> <i class="bi bi-search"></i> Sök </strong></h4>
                 <hr />
                 <div class="my-3">
-                    
+
                     <div class="mb-3">
                         <div class="input-group">
                             <div class="form-floating">
@@ -70,16 +25,16 @@
                                 <label for="InputSearch" class="form-label">Sök Produkt ....</label>
                             </div>
                             <button class="btn btn-warning text-light" @onclick="@(async() => await load())" title="Sök" style="font-size: 28px;"><i class="bi bi-search"></i></button>
-                            <button class="btn btn-light text-danger" @onclick="@(async() => await reset())" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
+                            <button class="btn btn-light text-danger" @onclick="@(async() => await init())" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
                         </div>
                     </div>
 
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedCity)"
-                                         Value="@_selectedCity"
-                                         ValueChanged="@(async (string value) => await citySelected(value))"
-                                         class="form-select" id="SelectCity">
+                            Value="@_selectedCity"
+                            ValueChanged="@(async (string value) => await citySelected(value))"
+                            class="form-select" id="SelectCity">
                                 <option value="">Alla</option>
 
                                 @foreach (var item in _cities ?? new())
@@ -96,9 +51,9 @@
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedDistrict)"
-                                         Value="@_selectedDistrict"
-                                         ValueChanged="@(async (string value) => await districtSelected(value))"
-                                         class="form-select" id="SelectDistrict">
+                            Value="@_selectedDistrict"
+                            ValueChanged="@(async (string value) => await districtSelected(value))"
+                            class="form-select" id="SelectDistrict">
                                 <option value="">Alla</option>
 
                                 @foreach (var item in _districts ?? new())
@@ -115,9 +70,9 @@
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedCompany)"
-                                         Value="@_selectedCompany"
-                                         ValueChanged="@(async (string value) => await companySelected(value))"
-                                         class="form-select" id="SelectCompany">
+                            Value="@_selectedCompany"
+                            ValueChanged="@(async (string value) => await companySelected(value))"
+                            class="form-select" id="SelectCompany">
                                 <option value="">Alla</option>
 
                                 @foreach (var item in _companies ?? new())
@@ -134,9 +89,9 @@
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedCategory)"
-                                         Value="@_selectedCategory"
-                                         ValueChanged="@(async (string value) => await categorySelected(value))"
-                                         class="form-select" id="SelectCategory">
+                            Value="@_selectedCategory"
+                            ValueChanged="@(async (string value) => await categorySelected(value))"
+                            class="form-select" id="SelectCategory">
                                 <option value="">Alla</option>
 
                                 @foreach (var item in _categories ?? new())
@@ -153,9 +108,9 @@
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
-                                         Value="@_selectedManifacturer"
-                                         ValueChanged="@(async (string value) => await manifacturerSelected(value))"
-                                         class="form-select" id="SelectManifacturer">
+                            Value="@_selectedManifacturer"
+                            ValueChanged="@(async (string value) => await manifacturerSelected(value))"
+                            class="form-select" id="SelectManifacturer">
                                 <option value="">Alla</option>
 
                                 @foreach (var item in _manifacturers ?? new())
@@ -172,9 +127,9 @@
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedSortBy)"
-                                         Value="@_selectedSortBy"
-                                         ValueChanged="@(async (string value) => await sortBySelected(value))"
-                                         class="form-select" id="SelectSort">
+                            Value="@_selectedSortBy"
+                            ValueChanged="@(async (string value) => await sortBySelected(value))"
+                            class="form-select" id="SelectSort">
                                 <option value="" selected>Id</option>
                                 <option value="name">Namn</option>
                                 <option value="price">Pris</option>
@@ -187,9 +142,9 @@
                     <div class="mb-1">
                         <div class="form-floating">
                             <InputSelect ValueExpression="@(()=>_selectedOrder)"
-                                         Value="@_selectedOrder"
-                                         ValueChanged="@(async (string value) => await orderBySelected(value))"
-                                         class="form-select" id="SelectOrder">
+                            Value="@_selectedOrder"
+                            ValueChanged="@(async (string value) => await orderBySelected(value))"
+                            class="form-select" id="SelectOrder">
                                 <option value="" selected>Uppstigande</option>
                                 <option value="desc">Nedåtgående</option>
                             </InputSelect>
@@ -203,6 +158,57 @@
 
         </div>
     </div>
+
+    <div class="col-md-8">
+        @* <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            xxx
+        </h3> *@
+
+        @* products *@
+        @* <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3" style="overflow-y: scroll; height:70vh;"> *@
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
+
+            @foreach (var item in _items)
+            {
+                <div class="col my-3">
+                    <div class="card shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" src="@item.ImageUrl" />
+                        <div class="card-body text-center">
+                            <p class="card-text fw-bold">@item.Name</p>
+                            <p class="card-text fst-italic"><strong>@item.Price.ToString("c")</strong></p>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Company.Name</small>
+                                <small class="text-body-secondary">@item.Category</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Company.City</small>
+                                <small class="text-body-secondary">@item.Company.District</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Manifacturer</small>
+                                <small class="text-body-secondary"></small>
+                            </div>
+
+                            @* <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary">View</button>
+                            </div> *@
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <_Paging TotalItems="@_totalItems" CurrentPage="@_page" OnPageChanged="pageChanged" />
+        @* <nav class="blog-pagination" aria-label="Pagination">
+            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
+            <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
+        </nav> *@
+
+    </div>
+
 </div>
 
 @code {
@@ -210,7 +216,7 @@
 
     private ApplicationDbContext _db => Service;
 
-    private IQueryable<Product> _query = default!;
+    // private IQueryable<Product> query = default!;
     private List<Product> _items = new();
 
     private bool _loading;
@@ -218,6 +224,7 @@
     //paging
     private int _page = 1;
     private int _pageSize = 100;
+    private int _totalItems = 0;
 
     //search
     private List<string> _cities = new();
@@ -229,7 +236,7 @@
 
     private List<string> _categories = new();
     private string? _selectedCategory;
-    private List<string>? _manifacturers = new();
+    private List<string> _manifacturers = new();
     private string? _selectedManifacturer;
 
     private string? _selectedSortBy;
@@ -239,18 +246,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _query = _db.Products
-        .Include(x => x.Company)
-        .AsNoTracking()
-        .AsQueryable();
-
-        _cities = await _query.Select(x => x.Company.City).Distinct().ToListAsync();
-        // _districts = await _query.Select(x => x.Company.District).Distinct().ToListAsync();
-
-        _categories = await _query.Select(x => x.Category).Distinct().ToListAsync();
-        _manifacturers = await _query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
-
-        await load();
+        await init();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -265,10 +261,15 @@
 
     private async Task load()
     {
-        _loading = true;
-        StateHasChanged();
+        // _loading = true;
+        // StateHasChanged();
 
-        _query = _query
+        var query = _db.Products
+        .Include(x => x.Company)
+        .AsNoTracking()
+        .AsQueryable();
+
+        query = query
         .Where(x =>
         (
             string.IsNullOrEmpty(_searchTerm) ||
@@ -281,144 +282,150 @@
             (string.IsNullOrEmpty(_selectedCompany) || x.Company.Name == _selectedCompany) &&
             (string.IsNullOrEmpty(_selectedCategory) || x.Category == _selectedCategory) &&
             (string.IsNullOrEmpty(_selectedManifacturer) || x.Manifacturer == _selectedManifacturer)
-        );
+        ).AsQueryable();
 
         if (_selectedSortBy == "name")
         {
             if (_selectedOrder == "desc")
             {
-                _query = _query.OrderByDescending(x => x.Name);
+                query = query.OrderByDescending(x => x.Name).AsQueryable();
             }
             else
             {
-                _query = _query.OrderBy(x => x.Name);
+                query = query.OrderBy(x => x.Name).AsQueryable();
             }
         }
         else if (_selectedSortBy == "price")
         {
             if (_selectedOrder == "desc")
             {
-                _query = _query.OrderByDescending(x => x.Price);
+                query = query.OrderByDescending(x => x.Price).AsQueryable();
             }
             else
             {
-                _query = _query.OrderBy(x => x.Price);
+                query = query.OrderBy(x => x.Price).AsQueryable();
             }
         }
         else if (_selectedSortBy == "category")
         {
             if (_selectedOrder == "desc")
             {
-                _query = _query.OrderByDescending(x => x.Category);
+                query = query.OrderByDescending(x => x.Category).AsQueryable();
             }
             else
             {
-                _query = _query.OrderBy(x => x.Category);
+                query = query.OrderBy(x => x.Category).AsQueryable();
             }
         }
         else if (_selectedSortBy == "manifacturer")
         {
             if (_selectedOrder == "desc")
             {
-                _query = _query.OrderByDescending(x => x.Manifacturer);
+                query = query.OrderByDescending(x => x.Manifacturer).AsQueryable();
             }
             else
             {
-                _query = _query.OrderBy(x => x.Manifacturer);
+                query = query.OrderBy(x => x.Manifacturer).AsQueryable();
             }
         }
         else
         {
             if (_selectedOrder == "desc")
             {
-                _query = _query.OrderByDescending(x => x.Id);
+                query = query.OrderByDescending(x => x.Id).AsQueryable();
             }
             else
             {
-                _query = _query.OrderBy(x => x.Id);
+                query = query.OrderBy(x => x.Id).AsQueryable();
             }
         }
 
-        _query = _query.Skip((_page - 1) * _pageSize)
-        .Take(_pageSize);
-        _items = await _query.ToListAsync();
+        _totalItems = await query.CountAsync();
 
-        _loading = false;
-        StateHasChanged();
+        //fill dropdowns
+        _districts = await query.Select(x => x.Company.District).Distinct().ToListAsync();
+        _companies = await query.Select(x => x.Company.Name!).Distinct().ToListAsync();
+        _manifacturers = await query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
+        _categories = await query.Select(x => x.Category).Distinct().ToListAsync();
+
+        query = query.Skip((_page - 1) * _pageSize)
+        .Take(_pageSize);
+
+        _items = await query.ToListAsync();
+
+        // _loading = false;
+        // StateHasChanged();
     }
 
     private async Task citySelected(string val)
     {
+        _page = 1;
         _selectedCity = val;
-
-        _districts.Clear();
-        _companies.Clear();
-        _selectedDistrict = default;
-        _selectedCompany = default;
-
-        var query = _db.Companies.Where(x => x.City == _selectedCity).AsQueryable();
-
-        _districts = await query.Select(x => x.District).Distinct().ToListAsync();
-        _companies = await query.Select(x => x.Name).Distinct().ToListAsync();
-
         await load();
     }
     private async Task districtSelected(string val)
     {
-        _companies.Clear();
-
+        _page = 1;
         _selectedDistrict = val;
-
-        _companies = await _db.Companies.Where(x => x.District == _selectedDistrict).Select(x => x.Name).Distinct().ToListAsync();
-
         await load();
     }
     private async Task companySelected(string val)
     {
+        _page = 1;
         _selectedCompany = val;
-
         await load();
     }
 
     private async Task categorySelected(string val)
     {
+        _page = 1;
         _selectedCategory = val;
-
         await load();
     }
 
     private async Task manifacturerSelected(string val)
     {
+        _page = 1;
         _selectedManifacturer = val;
-
         await load();
     }
 
     private async Task sortBySelected(string val)
     {
+        _page = 1;
         _selectedSortBy = val;
-
         await load();
     }
 
     private async Task orderBySelected(string val)
     {
+        _page = 1;
         _selectedOrder = val;
-
         await load();
     }
 
     private async Task search(ChangeEventArgs e)
     {
+        _page = 1;
         _searchTerm = (string)e.Value!;
         await load();
     }
 
-    private async Task reset()
+    private async Task init()
     {
+        _page = 1;
+
+        var query = _db.Products
+        .Include(x => x.Company)
+        .AsNoTracking()
+        .AsQueryable();
+
+        _cities = await query.Select(x => x.Company.City).Distinct().ToListAsync();
+        _companies = await query.Select(x => x.Company.Name).Distinct().ToListAsync();
+        _categories = await query.Select(x => x.Category).Distinct().ToListAsync();
+        _manifacturers = await query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
+
         _districts.Clear();
-        _companies.Clear();
-        _categories.Clear();
 
         _searchTerm = default;
         _selectedCity = default;
@@ -426,10 +433,18 @@
         _selectedCompany = default;
         _selectedCategory = default;
         _selectedManifacturer = default;
-        _page = 1;
         _selectedSortBy = default;
         _selectedOrder = default;
 
         await load();
     }
+
+    private async Task pageChanged(int page)
+    {
+        _page = page;
+
+        await load();
+
+        await _js.InvokeVoidAsync("ScrollToTop");
     }
+}

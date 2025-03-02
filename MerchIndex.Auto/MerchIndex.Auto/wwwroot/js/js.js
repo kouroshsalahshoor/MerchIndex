@@ -12,3 +12,16 @@
         toastr.error(message);
     }
 }
+
+function ScrollToTop() {
+    var element = document.getElementById("top");
+    element.scrollIntoView({
+        behavior: 'smooth'
+    });
+}
+function ScrollTo(elementId) {
+    var element = document.getElementById(elementId);
+    element.scrollIntoView({
+        behavior: 'smooth'
+    });
+}
