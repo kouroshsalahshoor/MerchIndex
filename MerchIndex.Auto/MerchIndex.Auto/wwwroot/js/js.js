@@ -2,7 +2,7 @@
 window.CloseMenu = () => {
     const menuToggle = document.getElementById('navbarSupportedContent');
     const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
-    bsCollapse.toggle();
+    bsCollapse.hide();
 }
 
 //window.CloseMenu = () => {
