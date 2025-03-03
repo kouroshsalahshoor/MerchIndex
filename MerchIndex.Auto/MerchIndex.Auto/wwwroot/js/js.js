@@ -29,35 +29,28 @@ window.ShowToastr = (type, message) => {
     }
 }
 
-//https://stackoverflow.com/questions/55186784/scroll-to-specified-part-of-page-when-clicking-top-navigation-link-in-blazor
-function ScrollToTop() {
-    var element = document.getElementById("top");
-    element.scrollIntoView({
-        behavior: 'smooth'
-    });
-}
-function ScrollTo(elementId) {
-    var element = document.getElementById(elementId);
-    element.scrollIntoView({
-        behavior: 'smooth'
-    });
-}
-
 //scroll button
 //https://mdbootstrap.com/snippets/standard/mdbootstrap/2964350#js-tab-view
+
+//Get the button
 let mybutton = document.getElementById("btn-back-to-top");
 
+// When the user scrolls down 20px from the top of the document, show the button
 window.onscroll = function () {
-    scrollFunction();
-};
-
-function scrollFunction() {
     if (
-        document.body.scrollTop > 200 ||
-        document.documentElement.scrollTop > 200
+        document.body.scrollTop > 400 ||
+        document.documentElement.scrollTop > 400
     ) {
         mybutton.style.display = "block";
     } else {
         mybutton.style.display = "none";
     }
+};
+
+//// When the user clicks on the button, scroll to the top of the document
+mybutton.addEventListener("click", backToTop);
+
+function backToTop() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
 }
