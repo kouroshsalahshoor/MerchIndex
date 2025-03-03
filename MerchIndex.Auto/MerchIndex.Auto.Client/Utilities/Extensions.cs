@@ -20,5 +20,10 @@ namespace MerchIndex.Auto.Client.Utilities
         {
             await js.InvokeVoidAsync("ShowToastr", "info", message);
         }
+
+        public static async Task CloseMenu(this IJSRuntime js)
+        {
+            await js.InvokeVoidAsync("CloseMenu");
+        }
     }
 }
