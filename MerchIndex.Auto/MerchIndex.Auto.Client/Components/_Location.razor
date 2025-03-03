@@ -1,4 +1,4 @@
-﻿@page "/location"
+﻿@* @page "/location" *@
 
 @using Persilsoft.Nominatim.Geolocation.Blazor
 @using Persilsoft.Nominatim.Geolocation.Blazor.Geocoding
@@ -10,10 +10,17 @@
 @rendermode InteractiveWebAssembly
 @attribute [StreamRendering]
 
-@_address
+@if (string.IsNullOrEmpty(_address))
+{
+    <_Loader />
+}
+else
+{
+    @_address
+}
 
 @code {
-    private string? _address = "Okänd";
+    private string? _address = null;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -31,9 +38,24 @@
             var longitude = position.Longitude;
 
             var address = await GeocoderService.GetGeocodingAddressAsync(latitude, longitude);
-            _address = address.DisplayAddress;
+            _address = address.DisplayAddress ?? "Okänd";
 
             StateHasChanged();
+
+            Console.WriteLine($"CountryCode: {address.CountryCode}");
+            Console.WriteLine($"PostalCode: {address.PostalCode}");
+            Console.WriteLine($"District: {address.District}");
+            Console.WriteLine($"Province: {address.Province}");
+            Console.WriteLine($"Department: {address.Department}");
+
+            var locs = address.DisplayAddress!.Split(",");
+            Console.WriteLine($"Street: {locs[0]}");
+            Console.WriteLine($"District: {locs[1]}");
+            Console.WriteLine($"Province: {locs[2]}");
+            Console.WriteLine($"County: {locs[3]}");
+            Console.WriteLine($"Postal Code: {locs[4]}");
+            Console.WriteLine($"Country: {locs[5]}");
+
         }
     }
 }

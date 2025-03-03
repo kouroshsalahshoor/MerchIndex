@@ -1,4 +1,12 @@
-﻿
+﻿.btn-warning {
+    background-color: darkorange;
+    color: white;
+}
+
+.btn:hover {
+    color: white;
+}
+
 .card-img-top {
     transition: transform 0.3s ease;
 }
