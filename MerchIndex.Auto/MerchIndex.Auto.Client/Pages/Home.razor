@@ -1,0 +1,32 @@
+﻿@page "/"
+
+@rendermode InteractiveWebAssembly
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+
+<div class="row text-center" style="height: 40vh;">
+    <div class="col-md-6 col-md-offset-3 m-auto">
+        <div class="mb-3">
+            <img src="images/merchindex.png" width="200" alt="MerchIndex" />
+        </div>
+
+        <div class="form-floating mb-3">
+            <input class="form-control rouded-pill" id="floatingInput" placeholder="">
+            <label for="floatingInput">Vad letar du efter?</label>
+        </div>
+        <div>
+            <i class="bi bi-geo-alt"></i>
+            <_Location />
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _title = "Hem";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _js.CloseMenu();
+    }
+}

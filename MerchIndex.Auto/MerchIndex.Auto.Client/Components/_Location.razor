@@ -40,7 +40,7 @@ else
             var longitude = position.Longitude;
 
             var address = await GeocoderService.GetGeocodingAddressAsync(latitude, longitude);
-            _address = address.DisplayAddress ?? "Okänd";
+            _address = address.DisplayAddress ?? "Okänd adress";
 
             StateHasChanged();
 
