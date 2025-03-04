@@ -13,9 +13,11 @@
 @using MerchIndex.Auto.Client.Services
 @using MerchIndex.Auto.Client.Utilities
 @using MerchIndex.Auto.Client.Components
+@using MerchIndex.Auto.Client.ViewModels
 
 @using Microsoft.AspNetCore.Authorization
 
 @inject IJSRuntime _js
 @inject NavigationManager _navigationManager
 @inject LocalStorageService _localStorageService
+@inject HttpClient _http

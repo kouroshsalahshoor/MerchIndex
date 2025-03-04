@@ -26,12 +26,12 @@ builder.Services.AddKeyedScoped<HttpClient>("RemoteAPIClientFromWASM",
                 throw new Exception("RemoteAPIBaseAddress is missing."))
        });
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7001/api/") });
-//builder.Services.AddScoped(sp =>
-//    new HttpClient
-//    {
-//        BaseAddress = new Uri(builder.Configuration["FrontendUrl"] ?? "https://localhost:7228/api/")
-//    });
+builder.Services.AddScoped(sp =>
+    new HttpClient
+    {
+        BaseAddress = new Uri(builder.Configuration["FrontendUrl"] ?? "https://localhost:7001/api/")
+    });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7001/api/") });
 
 builder.Services.AddSingleton<LocalStorageService>();
 

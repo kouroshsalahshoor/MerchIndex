@@ -5,28 +5,96 @@
 
 <PageTitle>@_title</PageTitle>
 
-<div class="row text-center" style="height: 40vh;">
+<div class="row text-center" style="height: 50vh;">
     <div class="col-md-6 col-md-offset-3 m-auto">
         <div class="mb-3">
             <img src="images/merchindex.png" width="200" alt="MerchIndex" />
         </div>
 
-        <div class="form-floating mb-3">
-            <input class="form-control rouded-pill" id="floatingInput" placeholder="">
-            <label for="floatingInput">Vad letar du efter?</label>
-        </div>
         <div>
             <i class="bi bi-geo-alt"></i>
             <_Location />
         </div>
+
+        <div class="form-floating mb-3">
+            <input class="form-control" id="floatingInput" placeholder="" @oninput=search style="border-radius: 30px">
+            <label for="floatingInput"><i class="bi bi-search"></i></label>
+        </div>
+
+        @if (_loading)
+        {
+            <_Loading />
+        }
+        else
+        {
+            if (_items != null)
+            {
+                <ul class="list-group text-start" style="height: 400px; overflow: auto">
+
+                    @foreach (var item in _items)
+                    {
+                        if (item.Product != null)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">@item.Product.Name</div>
+                                    <div>@item.Product.Manifacturer</div>
+                                    <div><i class="bi bi-geo-alt"></i> @item.Product.Company.City - @item.Product.Company.District</div>
+                                </div>
+                                <span class="badge text-bg-primary rounded-pill">Product</span>
+                            </li>
+                        }
+
+                        if (item.Company != null)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">@item.Company.Name</div>
+                                    <div>@item.Company.BusinessArea</div>
+                                    <div><i class="bi bi-geo-alt"></i> @item.Company.City - @item.Company.District</div>
+                                </div>
+                                <span class="badge text-bg-warning rounded-pill">Company</span>
+                            </li>
+                        }
+                    }
+
+                </ul>
+            }
+        }
+       
     </div>
 </div>
 
 @code {
     private string _title = "Hem";
 
+    private bool _loading;
+
+    private List<SearchResultVm>? _items;
+    private long? _selectedId;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await _js.CloseMenu();
+    }
+
+    private async Task search(ChangeEventArgs e)
+    {
+        _loading = true;
+        StateHasChanged();
+
+        var filter = e.Value?.ToString();
+        if (string.IsNullOrEmpty(filter))
+        {
+            _items = null;
+        }
+        else
+        {
+            var x = await _http.GetFromJsonAsync<List<SearchResultVm>>($"/api/search?filter={filter}");
+            _items = x;
+        }
+
+        _loading = false;
+        StateHasChanged();
     }
 }

@@ -24,7 +24,7 @@ public class Company
     public bool IsActive { get; set; }
     public bool HasBeenActivated { get; set; }
     public DateTime ActiveOn { get; set; } = new ();
-    public List<Product> Products { get; set; } = new ();
-    //public List<Service> Services { get; set; } = new ();
+    public List<Product>? Products { get; set; }
+    //public List<Service>? Services { get; set; }
 
 }
