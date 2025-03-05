@@ -17,19 +17,25 @@ namespace MerchIndex.Auto.Controllers
         [HttpGet]
         public IEnumerable<Person> GetAll()
         {
-            IEnumerable<Person> people = context.People.Include(p => p.Department).Include(p => p.Location);
-            foreach (Person p in people)
+            var x = new List<Person>();
+            for (int i = 1; i < 100; i++)
             {
-                if (p.Department?.People != null)
-                {
-                    p.Department.People = null;
-                }
-                if (p.Location?.People != null)
-                {
-                    p.Location.People = null;
-                }
+                x.Add(new Person { Id = i });
             }
-            return people;
+            return x;
+            //IEnumerable<Person> people = context.People.Include(p => p.Department).Include(p => p.Location);
+            //foreach (Person p in people)
+            //{
+            //    if (p.Department?.People != null)
+            //    {
+            //        p.Department.People = null;
+            //    }
+            //    if (p.Location?.People != null)
+            //    {
+            //        p.Location.People = null;
+            //    }
+            //}
+            //return people;
         }
         [HttpGet("{id}")]
         public async Task<Person> GetDetails(long id)

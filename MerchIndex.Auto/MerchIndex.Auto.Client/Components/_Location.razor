@@ -5,8 +5,8 @@
 @using Persilsoft.Nominatim.Geolocation.Blazor
 @using Persilsoft.Nominatim.Geolocation.Blazor.Geocoding
 
-@inject GeolocationService Geolocation
-@inject IGeocoder GeocoderService
+@inject GeolocationService _geolocation
+@inject IGeocoder _geocoderService
 
 @* @rendermode InteractiveAuto *@
 @rendermode InteractiveWebAssembly
@@ -33,31 +33,43 @@ else
     }
     private async Task setAddress()
     {
-        var position = await Geolocation.GetPosition();
-        if (!position.Equals(default))
+        try
         {
-            var latitude = position.Latitude;
-            var longitude = position.Longitude;
+            throw new Exception("Location not found");
+            var position = await _geolocation.GetPosition();
+            if (!position.Equals(default))
+            {
+                var latitude = position.Latitude;
+                var longitude = position.Longitude;
 
-            var address = await GeocoderService.GetGeocodingAddressAsync(latitude, longitude);
-            _address = address.DisplayAddress ?? "Okänd adress";
+                var address = await _geocoderService.GetGeocodingAddressAsync(latitude, longitude);
+                _address = address.DisplayAddress ?? "Okänd adress";
 
-            StateHasChanged();
+                StateHasChanged();
 
-            Console.WriteLine($"CountryCode: {address.CountryCode}");
-            Console.WriteLine($"PostalCode: {address.PostalCode}");
-            Console.WriteLine($"District: {address.District}");
-            Console.WriteLine($"Province: {address.Province}");
-            Console.WriteLine($"Department: {address.Department}");
+                Console.WriteLine($"CountryCode: {address.CountryCode}");
+                Console.WriteLine($"PostalCode: {address.PostalCode}");
+                Console.WriteLine($"District: {address.District}");
+                Console.WriteLine($"Province: {address.Province}");
+                Console.WriteLine($"Department: {address.Department}");
 
-            var locs = address.DisplayAddress!.Split(",");
-            Console.WriteLine($"Street: {locs[0]}");
-            Console.WriteLine($"District: {locs[1]}");
-            Console.WriteLine($"Province: {locs[2]}");
-            Console.WriteLine($"County: {locs[3]}");
-            Console.WriteLine($"Postal Code: {locs[4]}");
-            Console.WriteLine($"Country: {locs[5]}");
+                var locs = address.DisplayAddress!.Split(",");
+                Console.WriteLine($"Street: {locs[0]}");
+                Console.WriteLine($"District: {locs[1]}");
+                Console.WriteLine($"Province: {locs[2]}");
+                Console.WriteLine($"County: {locs[3]}");
+                Console.WriteLine($"Postal Code: {locs[4]}");
+                Console.WriteLine($"Country: {locs[5]}");
 
+                await _js.ToastrSuccess("Location found");
+            }
+        }
+        catch (Exception e)
+        {
+            await _js.ToastrWarning(e.Message);
+            // await _js.InvokeVoidAsync("alert", e.Message);
+
+            _navigationManager.NavigateTo("/products");
         }
     }
 }

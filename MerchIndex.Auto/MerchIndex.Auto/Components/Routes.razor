@@ -1,6 +1,7 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            @* <AuthorizeRouteView RouteData="routeData" DefaultLayout=@GetLayoutType()> *@
             <NotAuthorized>
                 <RedirectToLogin />
             </NotAuthorized>
@@ -15,4 +16,16 @@
 </Router>
 
 @code {
+    // private Type GetLayoutType()
+    // {
+    //     var relativePath = _navigationManager.ToBaseRelativePath(_navigationManager.Uri).ToLower();
+
+    //     if ((relativePath.Contains("admin") || relativePath.Contains("demo")) && relativePath.Contains("login") == false)
+    //     {
+    //         return typeof(Layout.AdminLayout);
+    //     }
+    //     else
+    //     {
+    //         return typeof(Layout.MainLayout);
+    //     }
 }
