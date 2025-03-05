@@ -22,6 +22,7 @@ else
 }
 
 @code {
+    private bool? _loading;
     private string? _address = null;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -33,6 +34,9 @@ else
     }
     private async Task setAddress()
     {
+        _loading = true;
+        StateHasChanged();
+
         try
         {
             throw new Exception("Location not found");
@@ -67,9 +71,13 @@ else
         catch (Exception e)
         {
             await _js.ToastrWarning(e.Message);
+            _address = "?";
             // await _js.InvokeVoidAsync("alert", e.Message);
 
-            _navigationManager.NavigateTo("/products");
+            // _navigationManager.NavigateTo("/products");
         }
+
+        _loading = true;
+        StateHasChanged();
     }
 }
