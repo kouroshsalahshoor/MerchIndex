@@ -39,7 +39,6 @@ else
 
         try
         {
-            throw new Exception("Location not found");
             var position = await _geolocation.GetPosition();
             if (!position.Equals(default))
             {
