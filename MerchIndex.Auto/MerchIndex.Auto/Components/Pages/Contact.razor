@@ -4,74 +4,152 @@
 @attribute [StreamRendering]
 
 <PageTitle>@_title</PageTitle>
+@* 
+<h3 class="border-bottom mb-5"><i class="bi bi-headset"></i> @_title</h3> *@
 
-<!-- Start Contact -->
-<section id="contact-us" class="contact-us section">
-    <div class="container">
-        <div class="contact-head">
-            <div class="row">
-                <div class="col-lg-8 col-12">
-                    <div class="form-main">
-                        <div class="title">
-                            <h4>Get in touch</h4>
-                            <h3>Write us a message</h3>
-                        </div>
-                        <form class="form" method="post" action="mail/mail.php">
-                            <div class="row">
-                                <div class="col-lg-6 col-12">
-                                    <div class="form-group">
-                                        <label>Your Name<span>*</span></label>
-                                        <input name="name" type="text" placeholder="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-12">
-                                    <div class="form-group">
-                                        <label>Your Subjects<span>*</span></label>
-                                        <input name="subject" type="text" placeholder="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-12">
-                                    <div class="form-group">
-                                        <label>Your Email<span>*</span></label>
-                                        <input name="email" type="email" placeholder="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-12">
-                                    <div class="form-group">
-                                        <label>Your Phone<span>*</span></label>
-                                        <input name="company_name" type="text" placeholder="">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group message">
-                                        <label>your message<span>*</span></label>
-                                        <textarea name="message" placeholder=""></textarea>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group button">
-                                        <button type="submit" class="btn ">Send Message</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+<div class="row g-5">
+
+    <div class="col-md-5 col-lg-4 order-md-last">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-warning"><i class="bi bi-headset"></i> Kontakt</span>
+        </h4>
+        <hr class="my-4">
+
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between lh-sm p-4">
+                <div>
+                    <h6 class="my-0"><i class="bi bi-telephone"></i> Tel</h6>
+                    @* <small class="text-body-secondary"></small> *@
+                </div>
+                <span class="text-body-secondary">+46 700284002</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-sm p-4">
+                <div>
+                    <h6 class="my-0"><i class="bi bi-envelope"></i> Email</h6>
+                </div>
+                <span class="text-body-secondary">kourosh23@@hotmail.com</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-sm p-4">
+                <div>
+                    <h6 class="my-0"><i class="bi bi-geo-alt"></i> Adress</h6>
+                </div>
+                <span class="text-body-secondary">Stockholm - Sollentuna</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-md-7 col-lg-8">
+        <EditForm Model="_model" OnValidSubmit="submit" FormName="create" Enhance>
+            <h4 class="mb-3"><i class="bi bi-envelope"></i> Meddelande</h4>
+            <hr class="my-4">
+
+            <div class="row g-3">
+                <DataAnnotationsValidator />
+                @* <ValidationSummary class="text-danger" role="alert" /> *@
+                <_errors Items="@_errors" />
+
+                <div class="col-sm-6">
+                    <div class="form-floating">
+                        <InputText @bind-Value="_model.FirstName" class="form-control" id="Input.FirstName" placeholder="" />
+                        <label for="Input.FirstName">Förnamn</label>
+                        <ValidationMessage For="() => _model.FirstName" class="text-danger" />
                     </div>
                 </div>
-                <div class="col-lg-4 col-12">
-                    <_Contact />
+
+                <div class="col-sm-6">
+                    <div class="form-floating">
+                        <InputText @bind-Value="_model.LastName" class="form-control" id="Input.LastName" placeholder="" />
+                        <label for="Input.LastName">Efternamn</label>
+                        <ValidationMessage For="() => _model.LastName" class="text-danger" />
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-floating">
+                        <InputText @bind-Value="_model.Email" class="form-control" id="Input.Email" placeholder="" />
+                        <label for="Input.Email">Email</label>
+                        <ValidationMessage For="() => _model.Email" class="text-danger" />
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-floating">
+                        <InputText @bind-Value="_model.Tel" class="form-control" id="Input.Tel" placeholder="" />
+                        <label for="Input.Tel">Tel</label>
+                        <ValidationMessage For="() => _model.Tel" class="text-danger" />
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-floating">
+                        <InputText @bind-Value="_model.Subject" class="form-control" id="Input.Subject" placeholder="" />
+                        <label for="Input.Subject">Titel</label>
+                        <ValidationMessage For="() => _model.Subject" class="text-danger" />
+                    </div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="form-floating">
+                        <InputTextArea @bind-Value="_model.Body" class="form-control" id="Input.Body" placeholder="" style="min-height:200px;" />
+                        <label for="Input.Body">Body</label>
+                        <ValidationMessage For="() => _model.Body" class="text-danger" />
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <hr class="my-4">
+
+            <button class="w-100 btn btn-warning btn-lg" type="submit"><i class="bi bi-send"></i> Skicka</button>
+        </EditForm>
     </div>
-</section>
-<!--/ End Contact -->
-<!-- Map Section -->
-<div class="map-section">
-    <div id="myMap"></div>
 </div>
-<!--/ End Map Section -->
+
+@if (_success)
+{
+    <div class="alert alert-success alert-dismissible m-5" role="alert">
+        <div>Stort Tack för meddelandet! Vi hör av oss så fort vi kan</div>   <button type="button" class="btn-close" @onclick="(() => _success = false)"></button>
+    </div>
+}
 
 @code {
-    private string _title = "Contact";
+    private ApplicationDbContext _db => Service;
 
+    [SupplyParameterFromForm]
+    private Message _model { get; set; } = new();
+
+    private string _title = "Kontakt";
+    private bool _loading;
+    private bool _success;
+
+    private List<string> _errors = new();
+
+    private async Task submit()
+    {
+        _success = false;
+        _loading = true;
+        StateHasChanged();
+
+        _errors.Clear();
+
+        _model.CreatedOn = DateTime.Now;
+        _db.Messages.Add(_model);
+
+        try
+        {
+            await _db.SaveChangesAsync();
+
+            _model = new();
+            await _js.ToastrSuccess(Constants.SaveSuccess);
+
+            _success = true;
+            StateHasChanged();
+        }
+        catch (DbUpdateConcurrencyException e)
+        {
+            _errors.Add(Constants.SaveErrorText);
+            _errors.Add(e.Message);
+        }
+
+        _loading = true;
+        StateHasChanged();
+    }
 }

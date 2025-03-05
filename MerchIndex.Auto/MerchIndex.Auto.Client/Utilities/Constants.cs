@@ -13,6 +13,7 @@
         public const string SaveErrorText = "Fel vid sparande av data";
 
         public const string SaveSuccess = "Spara data lyckades.";
+        public const string MessageSuccess = "Meddelande shickat.";
         
     }
 }
