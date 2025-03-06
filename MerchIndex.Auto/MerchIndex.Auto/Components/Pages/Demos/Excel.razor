@@ -45,7 +45,8 @@ else
                 <tr>
                     <th scope="row">@(_row++)</th>
                     <td>@item.Name</td>
-                    <td>@item.Price.ToString("c")</td>
+                    <td>@item.Price</td>
+                    @* <td>@item.Price.ToString("c")</td> *@
                     <td>@item.Category</td>
                     <td>@item.Manifacturer</td>
                 </tr>

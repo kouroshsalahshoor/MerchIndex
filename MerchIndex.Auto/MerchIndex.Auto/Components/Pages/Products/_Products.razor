@@ -10,13 +10,68 @@
 }
 
 <div class="row g-2">
+    
+    <div class="col-md-8">
+        @* <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            xxx
+        </h3> *@
+
+        @* products *@
+        @* <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3" style="overflow-y: scroll; height:70vh;"> *@
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
+
+            @foreach (var item in _items)
+            {
+                <div class="col my-3">
+                    <div class="card shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" src="@item.ImageUrl" />
+                        <div class="card-body text-center">
+                            <p class="card-text fw-bold">@item.Name</p>
+                            <p class="card-text fst-italic"><strong>@item.Price</strong> kr</p>
+                            @* <p class="card-text fst-italic"><strong>@item.Price.ToString("c")</strong></p> *@
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Company.Name</small>
+                                <small class="text-body-secondary">@item.Category</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Company.City</small>
+                                <small class="text-body-secondary">@item.Company.District</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Manifacturer</small>
+                                <small class="text-body-secondary"></small>
+                            </div>
+
+                            @* <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary">View</button>
+                            </div> *@
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <_Paging TotalItems="@_totalItems" CurrentPage="@_page" OnPageChanged="pageChanged" />
+        @* <nav class="blog-pagination" aria-label="Pagination">
+            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
+            <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
+        </nav> *@
+
+    </div>
+
     <div class="col-md-4">
         <div class="position-sticky" style="top: 2rem;">
 
             <div class="p-4">
                 <h4 class="fst-italic"><strong> <i class="bi bi-search"></i> Sök </strong></h4>
                 <hr />
-                <div class="my-3">
+
+                <_Search />
+
+                @* <div class="my-3">
 
                     <div class="mb-3">
                         <div class="input-group">
@@ -152,61 +207,11 @@
                         </div>
                     </div>
 
-                </div>
+                </div> *@
 
             </div>
 
         </div>
-    </div>
-
-    <div class="col-md-8">
-        @* <h3 class="pb-4 mb-4 fst-italic border-bottom">
-            xxx
-        </h3> *@
-
-        @* products *@
-        @* <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3" style="overflow-y: scroll; height:70vh;"> *@
-        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
-
-            @foreach (var item in _items)
-            {
-                <div class="col my-3">
-                    <div class="card shadow-sm">
-                        <img class="bd-placeholder-img card-img-top" src="@item.ImageUrl" />
-                        <div class="card-body text-center">
-                            <p class="card-text fw-bold">@item.Name</p>
-                            <p class="card-text fst-italic"><strong>@item.Price.ToString("c")</strong></p>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-body-secondary">@item.Company.Name</small>
-                                <small class="text-body-secondary">@item.Category</small>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-body-secondary">@item.Company.City</small>
-                                <small class="text-body-secondary">@item.Company.District</small>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-body-secondary">@item.Manifacturer</small>
-                                <small class="text-body-secondary"></small>
-                            </div>
-
-                            @* <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-primary">View</button>
-                            </div> *@
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <_Paging TotalItems="@_totalItems" CurrentPage="@_page" OnPageChanged="pageChanged" />
-        @* <nav class="blog-pagination" aria-label="Pagination">
-            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
-            <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
-        </nav> *@
-
     </div>
 
 </div>

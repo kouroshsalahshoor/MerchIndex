@@ -26,5 +26,6 @@ public class Company
     public DateTime ActiveOn { get; set; } = new ();
     public List<Product>? Products { get; set; }
     //public List<Service>? Services { get; set; }
+    public string? Url { get; set; }
 
 }

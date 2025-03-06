@@ -89,6 +89,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="Nexmo.Csharp.Client" Version="5.2.0" />
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.103.7.1" />
   </ItemGroup>
 
