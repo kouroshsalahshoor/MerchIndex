@@ -123,6 +123,7 @@ builder.Services.AddScoped<ExcelService>();
 builder.Services.AddGeolocationService();
 builder.Services.AddNominatimGeocoderService();
 builder.Services.AddScoped<GeolocationService>();
+builder.Services.AddScoped<SmsService>();
 
 var app = builder.Build();
 
