@@ -3,6 +3,7 @@ using Nexmo.Api.Request;
 
 namespace MerchIndex.Auto.Services
 {
+    //https://developer.vonage.com/en/api/sms
     public class SmsService
     {
         public IConfiguration Configuration { get; set; }
