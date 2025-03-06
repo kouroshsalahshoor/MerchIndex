@@ -1,0 +1,343 @@
+﻿<div class="p-4">
+    <h4 class="fst-italic"><strong> <i class="bi bi-search"></i> Sök </strong></h4>
+    <hr />
+    <div class="my-3">
+
+        <div class="mb-3">
+            <div class="input-group">
+                <div class="form-floating">
+                    <input class="form-control" id="InputSearch" placeholder="" @bind-value="@_searchTerm" @oninput="search">
+                    <label for="InputSearch" class="form-label">Sök Produkt ....</label>
+                </div>
+                <button class="btn btn-warning text-light" @onclick="@(async() => await load())" title="Sök" style="font-size: 28px;"><i class="bi bi-search"></i></button>
+                <button class="btn btn-light text-danger" @onclick="@(async() => await init())" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
+            </div>
+        </div>
+
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedCity)"
+                             Value="@_selectedCity"
+                             ValueChanged="@(async (string value) => await citySelected(value))"
+                             class="form-select" id="SelectCity">
+                    <option value="">Alla</option>
+
+                    @foreach (var item in _cities ?? new())
+                    {
+                        if (string.IsNullOrEmpty(item) == false)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </InputSelect>
+                <label for="SelectCity">Välj en Stad</label>
+            </div>
+        </div>
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedDistrict)"
+                             Value="@_selectedDistrict"
+                             ValueChanged="@(async (string value) => await districtSelected(value))"
+                             class="form-select" id="SelectDistrict">
+                    <option value="">Alla</option>
+
+                    @foreach (var item in _districts ?? new())
+                    {
+                        if (string.IsNullOrEmpty(item) == false)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </InputSelect>
+                <label for="SelectCity">Välj en Ort</label>
+            </div>
+        </div>
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedCompany)"
+                             Value="@_selectedCompany"
+                             ValueChanged="@(async (string value) => await companySelected(value))"
+                             class="form-select" id="SelectCompany">
+                    <option value="">Alla</option>
+
+                    @foreach (var item in _companies ?? new())
+                    {
+                        if (string.IsNullOrEmpty(item) == false)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </InputSelect>
+                <label for="SelectCity">Välj ett Företag</label>
+            </div>
+        </div>
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedCategory)"
+                             Value="@_selectedCategory"
+                             ValueChanged="@(async (string value) => await categorySelected(value))"
+                             class="form-select" id="SelectCategory">
+                    <option value="">Alla</option>
+
+                    @foreach (var item in _categories ?? new())
+                    {
+                        if (string.IsNullOrEmpty(item) == false)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </InputSelect>
+                <label for="SelectCategory">Välj en Kategorier</label>
+            </div>
+        </div>
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
+                             Value="@_selectedManifacturer"
+                             ValueChanged="@(async (string value) => await manifacturerSelected(value))"
+                             class="form-select" id="SelectManifacturer">
+                    <option value="">Alla</option>
+
+                    @foreach (var item in _manifacturers ?? new())
+                    {
+                        if (string.IsNullOrEmpty(item) == false)
+                        {
+                            <option value="@item">@item</option>
+                        }
+                    }
+                </InputSelect>
+                <label for="SelectManifacturer">Välj en Tillverkare</label>
+            </div>
+        </div>
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedSortBy)"
+                             Value="@_selectedSortBy"
+                             ValueChanged="@(async (string value) => await sortBySelected(value))"
+                             class="form-select" id="SelectSort">
+                    <option value="" selected>Id</option>
+                    <option value="name">Namn</option>
+                    <option value="price">Pris</option>
+                    <option value="category">Kategori</option>
+                    <option value="manifacturer">Tillverkare</option>
+                </InputSelect>
+                <label for="SelectSort">Sortera Efter</label>
+            </div>
+        </div>
+        <div class="mb-1">
+            <div class="form-floating">
+                <InputSelect ValueExpression="@(()=>_selectedOrder)"
+                             Value="@_selectedOrder"
+                             ValueChanged="@(async (string value) => await orderBySelected(value))"
+                             class="form-select" id="SelectOrder">
+                    <option value="" selected>Uppstigande</option>
+                    <option value="desc">Nedåtgående</option>
+                </InputSelect>
+                <label for="SelectOrder">Ordning</label>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter] public string? SearchTerm { get; set; }
+
+    private ApplicationDbContext _db => Service;
+
+    private List<string> _cities = new();
+    private string? _selectedCity;
+    private List<string> _districts = new();
+    private string? _selectedDistrict;
+    private List<string> _companies = new();
+    private string? _selectedCompany;
+
+    private List<string> _categories = new();
+    private string? _selectedCategory;
+    private List<string> _manifacturers = new();
+    private string? _selectedManifacturer;
+
+    private string? _selectedSortBy;
+    private string? _selectedOrder;
+
+    private string? _searchTerm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await init();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(SearchTerm) == false)
+        {
+            _searchTerm = SearchTerm.Trim().ToLower();
+
+            await load();
+        }
+    }
+
+    private async Task load()
+    {
+        // _loading = true;
+        // StateHasChanged();
+
+        var query = _db.Products
+        .Include(x => x.Company)
+        .AsNoTracking()
+        .AsQueryable();
+
+        query = query
+        .Where(x =>
+        (
+            string.IsNullOrEmpty(_searchTerm) ||
+            x.Name.ToLower().Contains(_searchTerm) ||
+            x.Price.ToString().Contains(_searchTerm) ||
+            x.Category.ToLower().Contains(_searchTerm)
+        ) &&
+            (string.IsNullOrEmpty(_selectedCity) || x.Company.City == _selectedCity) &&
+            (string.IsNullOrEmpty(_selectedDistrict) || x.Company.District == _selectedDistrict) &&
+            (string.IsNullOrEmpty(_selectedCompany) || x.Company.Name == _selectedCompany) &&
+            (string.IsNullOrEmpty(_selectedCategory) || x.Category == _selectedCategory) &&
+            (string.IsNullOrEmpty(_selectedManifacturer) || x.Manifacturer == _selectedManifacturer)
+        ).AsQueryable();
+
+        if (_selectedSortBy == "name")
+        {
+            if (_selectedOrder == "desc")
+            {
+                query = query.OrderByDescending(x => x.Name).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Name).AsQueryable();
+            }
+        }
+        else if (_selectedSortBy == "price")
+        {
+            if (_selectedOrder == "desc")
+            {
+                query = query.OrderByDescending(x => x.Price).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Price).AsQueryable();
+            }
+        }
+        else if (_selectedSortBy == "category")
+        {
+            if (_selectedOrder == "desc")
+            {
+                query = query.OrderByDescending(x => x.Category).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Category).AsQueryable();
+            }
+        }
+        else if (_selectedSortBy == "manifacturer")
+        {
+            if (_selectedOrder == "desc")
+            {
+                query = query.OrderByDescending(x => x.Manifacturer).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Manifacturer).AsQueryable();
+            }
+        }
+        else
+        {
+            if (_selectedOrder == "desc")
+            {
+                query = query.OrderByDescending(x => x.Id).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Id).AsQueryable();
+            }
+        }
+
+        // _totalItems = await query.CountAsync();
+
+        //fill dropdowns
+        _districts = await query.Select(x => x.Company.District).Distinct().ToListAsync();
+        _companies = await query.Select(x => x.Company.Name!).Distinct().ToListAsync();
+        _manifacturers = await query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
+        _categories = await query.Select(x => x.Category).Distinct().ToListAsync();
+
+        // query = query.Skip((_page - 1) * _pageSize)
+        // .Take(_pageSize);
+
+        // _items = await query.ToListAsync();
+
+        // _loading = false;
+        // StateHasChanged();
+    }
+
+    private async Task citySelected(string val)
+    {
+        _selectedCity = val;
+    }
+    private async Task districtSelected(string val)
+    {
+        _selectedDistrict = val;
+    }
+    private async Task companySelected(string val)
+    {
+        _selectedCompany = val;
+    }
+
+    private async Task categorySelected(string val)
+    {
+        _selectedCategory = val;
+    }
+
+    private async Task manifacturerSelected(string val)
+    {
+        _selectedManifacturer = val;
+    }
+
+    private async Task sortBySelected(string val)
+    {
+        _selectedSortBy = val;
+    }
+
+    private async Task orderBySelected(string val)
+    {
+        _selectedOrder = val;
+    }
+
+    private async Task search(ChangeEventArgs e)
+    {
+        _searchTerm = (string)e.Value!;
+    }
+
+    private async Task init()
+    {
+        var query = _db.Products
+        .Include(x => x.Company)
+        .AsNoTracking()
+        .AsQueryable();
+
+        _cities = await query.Select(x => x.Company.City).Distinct().ToListAsync();
+        _companies = await query.Select(x => x.Company.Name).Distinct().ToListAsync();
+        _categories = await query.Select(x => x.Category).Distinct().ToListAsync();
+        _manifacturers = await query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
+
+        _districts.Clear();
+
+        _searchTerm = default;
+        _selectedCity = default;
+        _selectedDistrict = default;
+        _selectedCompany = default;
+        _selectedCategory = default;
+        _selectedManifacturer = default;
+        _selectedSortBy = default;
+        _selectedOrder = default;
+
+        await load();
+    }
+
+}

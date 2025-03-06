@@ -39,6 +39,8 @@ else
 
         try
         {
+            // throw new Exception("Test exception");
+
             var position = await _geolocation.GetPosition();
             if (!position.Equals(default))
             {
@@ -69,8 +71,11 @@ else
         }
         catch (Exception e)
         {
-            await _js.ToastrWarning(e.Message);
+            await _js.ToastrWarning("Adress okänt");
+            // await _js.ToastrWarning(e.Message);
             _address = "?";
+
+            await _js.InvokeVoidAsync("openOffCanvas");
             // await _js.InvokeVoidAsync("alert", e.Message);
 
             // _navigationManager.NavigateTo("/products");

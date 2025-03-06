@@ -4,43 +4,50 @@
 @attribute [StreamRendering]
 
 <PageTitle>@_title</PageTitle>
-@* 
-<h3 class="border-bottom mb-5"><i class="bi bi-headset"></i> @_title</h3> *@
+
+<h3>@_title</h3>
+<hr />
 
 <div class="row g-5">
 
-    <div class="col-md-5 col-lg-4 order-md-last">
+    <div class="col-md-4 order-2">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-warning"><i class="bi bi-headset"></i> Kontakt</span>
+            <span><i class="bi bi-headset"></i> Hör av er</span>
         </h4>
         <hr class="my-4">
 
-        <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between lh-sm p-4">
-                <div>
-                    <h6 class="my-0"><i class="bi bi-telephone"></i> Tel</h6>
-                    @* <small class="text-body-secondary"></small> *@
-                </div>
-                <span class="text-body-secondary">+46 700284002</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between lh-sm p-4">
-                <div>
-                    <h6 class="my-0"><i class="bi bi-envelope"></i> Email</h6>
-                </div>
-                <span class="text-body-secondary">kourosh23@@hotmail.com</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between lh-sm p-4">
-                <div>
-                    <h6 class="my-0"><i class="bi bi-geo-alt"></i> Adress</h6>
-                </div>
-                <span class="text-body-secondary">Stockholm - Sollentuna</span>
-            </li>
-        </ul>
+        <div class="">
+            <div class="">
+                <button class="btn btn-warning text-white" disabled style="background-color:darkorange; opacity:1"><i class="fa fa-phone"></i></button>
+                <h4 class="title my-2">Ring Oss</h4>
+                <ul style="list-style-type: none;">
+                    <li><a href="tel:+46700284002" class="text-decoration-none text-black">+46 700284002</a></li>
+                    <li></li>
+                </ul>
+            </div>
+            <div class="">
+                <button class="btn btn-warning text-white" disabled style="background-color:darkorange; opacity:1"><i class="fa fa-envelope-open"></i></button>
+                <h4 class="title my-2">Email</h4>
+                <ul style="list-style-type: none;">
+                    <li><a href="mailto:kourosh23@hotmail.com" class="text-decoration-none text-black">kourosh23@hotmail.com</a></li>
+                    <li></li>
+                </ul>
+            </div>
+            <div class="">
+                <button class="btn btn-warning text-white" disabled style="background-color:darkorange; opacity:1"><i class="fa fa-location-arrow"></i></button>
+                <h4 class="title my-2">Adress</h4>
+                <ul style="list-style-type: none;">
+                    <li>Sollentuna - Stockholm</li>
+                    <li></li>
+                </ul>
+            </div>
+        </div>
+
     </div>
 
-    <div class="col-md-7 col-lg-8">
+    <div class="col-md-8 order-1">
         <EditForm Model="_model" OnValidSubmit="submit" FormName="create" Enhance>
-            <h4 class="mb-3"><i class="bi bi-envelope"></i> Meddelande</h4>
+            <h4 class="mb-3"><i class="bi bi-envelope"></i> Skriv till oss</h4>
             <hr class="my-4">
 
             <div class="row g-3">

@@ -54,3 +54,10 @@ function backToTop() {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
 }
+
+//Offcanvas
+window.openOffCanvas = function () {
+    var offcanvasNavbar = document.getElementById('offcanvasNavbar')
+    var bsOffcanvas = new bootstrap.Offcanvas(offcanvasNavbar)
+    bsOffcanvas.show()
+}
