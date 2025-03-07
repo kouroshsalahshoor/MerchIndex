@@ -28,7 +28,7 @@
     <EditForm Model="Input" method="post" OnValidSubmit="submit" FormName="register" class="row g-3">
         <div class="row">
             <DataAnnotationsValidator />
-            @if (_errors.Any())
+            @* @if (_errors.Any())
             {
                 <ul class="text-danger">
                     @foreach (var error in _errors)
@@ -38,7 +38,7 @@
                 </ul>
             }
             <StatusMessage Message="@Message" />
-            <ValidationSummary class="text-danger" role="alert" />
+            <ValidationSummary class="text-danger" role="alert" /> *@
         </div>
         <div class="col-md-6">
             <div class="form-floating mb-3">
@@ -145,6 +145,26 @@
             </div>
         </div>
 
+        <div class="checkbox mb-3">
+            <label class="form-label">
+                <InputCheckbox @bind-Value="Input.Accepted" class="darker-border-checkbox form-check-input" />
+                Jag håller med om alla uttalanden i <a href="terms" target="_blank">användarvillkor</a>
+            </label>
+        </div>
+
+
+        @if (_errors.Any())
+        {
+            <ul class="text-danger">
+                @foreach (var error in _errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        }
+        <StatusMessage Message="@Message" />
+        <ValidationSummary class="text-danger" role="alert" />
+
         <div class="col-12 text-center">
             <button type="submit" class="btn btn-warning btn-lg w-75"><i class="bi bi-person-add"></i> Registrera</button>
         </div>
@@ -191,10 +211,18 @@
 
     private async Task save()
     {
+        //check if terms accepted
+        if (Input.Accepted == false)
+        {
+            _errors.Add("Måste acceptera användarvillkoren");
+            return;
+        }
+
         //check if company name already exists
         if (await _db.Companies.AnyAsync(x => x.Name == Input.CompanyName))
         {
             _errors.Add(Constants.SameNameText);
+            return;
         }
 
         // https://learn.microsoft.com/en-us/ef/core/saving/transactions
@@ -389,5 +417,8 @@
         [Required]
         [Display(Name = "Hemsida")]
         public string? Url { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "Användarvillkor")]
+        public bool Accepted { get; set; }
     }
 }

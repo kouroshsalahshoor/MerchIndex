@@ -1,0 +1,93 @@
+﻿@page "/xcompanies"
+
+@rendermode InteractiveServer
+
+<PageTitle>@_title</PageTitle>
+
+<style>
+    li > a {
+        text-decoration: none;
+    }
+
+    a {
+        color: white;
+    }
+
+    card h3, card p, card small {
+        text-shadow: 2px 2px black;
+    }
+</style>
+
+@* https://getbootstrap.com/docs/5.3/examples/features/ *@
+<h2 class="pb-2 border-bottom">@_title</h2>
+
+<_Paging TotalItems="10023" />
+
+<div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+
+    @foreach (var item in _items)
+    {
+        <div class="col">
+
+            <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('/images/demo/company.jpeg');">
+                <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+                    <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">@item.Name</h3>
+                    <p class="fw-bold"><a href="company/@item.Id"><i class="bi bi-geo-alt"></i> @item.City @item.District</a></p>
+                    <ul class="d-flex list-unstyled mt-auto">
+                        <li class="me-auto" title="Produkter">
+                            <a href="products/company/@item.Id">
+                                <i class="bi bi-boxes"></i>
+                                @* <img src="https://github.com/twbs.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white"> *@
+                                <small>Produkter</small>
+                            </a>
+                        </li>
+                        <li class="d-flex align-items-center me-3" title="Email">
+                            <a href="company/@item.Id">
+                                <i class="bi bi-envelope"></i>
+                                <small>@item.Email</small>
+                            </a>
+                        </li>
+                        <li class="d-flex align-items-center" title="Tel">
+                            <a href="company/@item.Id">
+                                <i class="bi bi-headset"></i>
+                                <small>@item.Tel</small>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+@code {
+    private ApplicationDbContext _db => Service;
+    private string _title = "Företag";
+
+    private List<Company> _items { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // // _items = await _db.Companies.ToListAsync();
+        // for (int city = 1; city <= 10; city++)
+        // {
+        //     for (int district = 1; district <= 10; district++)
+        //     {
+        //         for (int i = 1; i <= 100; i++)
+        //         {
+        //             _items.Add(new Company
+        //                 {
+        //                     Name = $"Company {i}",
+        //                     City = $"City {city}",
+        //                     District = $"District {district}",
+        //                     Tel = $"Tel {i}",
+        //                     Email = $"Email {i}",
+        //                 });
+        //         }
+        //     }
+        // }
+        
+    }
+}

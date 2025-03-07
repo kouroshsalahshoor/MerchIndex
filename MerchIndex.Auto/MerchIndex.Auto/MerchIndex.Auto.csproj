@@ -58,6 +58,7 @@
     <Content Remove="Components\Layout\SportsStoreLayout.razor" />
     <Content Remove="Components\Layout\_Header.razor" />
     <Content Remove="Components\Pages\Admin\Product\Index - Copy.razor" />
+    <Content Remove="Components\Pages\Companies\Index - Copy.razor" />
     <Content Remove="Components\Pages\Products\_Products2.razor" />
     <Content Remove="Components\Routes - Copy.razor" />
     <Content Remove="wwwroot\app.css" />

@@ -44,10 +44,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedDistrict)"
-                Value="@_selectedDistrict"
-                ValueChanged="@(async (string value) => await districtSelected(value))"
-                class="form-select" id="SelectDistrict"
-                disabled="@_districtDisabled">
+                             Value="@_selectedDistrict"
+                             ValueChanged="@(async (string value) => await districtSelected(value))"
+                             class="form-select" id="SelectDistrict"
+                             disabled="@_districtDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _districts ?? new())
@@ -64,10 +64,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCompany)"
-                Value="@_selectedCompany"
-                ValueChanged="@((string value) => companySelected(value))"
-                class="form-select" id="SelectCompany"
-                disabled="@_companyDisabled">
+                             Value="@_selectedCompany"
+                             ValueChanged="@((string value) => companySelected(value))"
+                             class="form-select" id="SelectCompany"
+                             disabled="@_companyDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _companies ?? new())
@@ -84,10 +84,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCategory)"
-                Value="@_selectedCategory"
-                ValueChanged="@((string value) => categorySelected(value))"
-                class="form-select" id="SelectCategory"
-                disabled="@_categoryDisabled">
+                             Value="@_selectedCategory"
+                             ValueChanged="@((string value) => categorySelected(value))"
+                             class="form-select" id="SelectCategory"
+                             disabled="@_categoryDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _categories ?? new())
@@ -104,10 +104,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
-                Value="@_selectedManifacturer"
-                ValueChanged="@((string value) => manifacturerSelected(value))"
-                class="form-select" id="SelectManifacturer"
-                disabled="@_manifacturerDisabled">
+                             Value="@_selectedManifacturer"
+                             ValueChanged="@((string value) => manifacturerSelected(value))"
+                             class="form-select" id="SelectManifacturer"
+                             disabled="@_manifacturerDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _manifacturers ?? new())
@@ -124,9 +124,9 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedSortBy)"
-                Value="@_selectedSortBy"
-                ValueChanged="@((string value) => sortBySelected(value))"
-                class="form-select" id="SelectSort">
+                             Value="@_selectedSortBy"
+                             ValueChanged="@((string value) => sortBySelected(value))"
+                             class="form-select" id="SelectSort">
                     @* <option value="" selected>Id</option> *@
                     <option value="name" selected>Namn</option>
                     <option value="price">Pris</option>
@@ -139,9 +139,9 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedOrder)"
-                Value="@_selectedOrder"
-                ValueChanged="@((string value) => orderBySelected(value))"
-                class="form-select" id="SelectOrder">
+                             Value="@_selectedOrder"
+                             ValueChanged="@((string value) => orderBySelected(value))"
+                             class="form-select" id="SelectOrder">
                     <option value="" selected>Uppstigande</option>
                     <option value="desc">Nedåtgående</option>
                 </InputSelect>
@@ -155,8 +155,12 @@
 
 @code {
     [Parameter] public string? SearchTerm { get; set; }
+    [Parameter] public bool IsInPage { get; set; } 
+    [Parameter] public EventCallback<SearchVm> OnSearch { get; set; }
 
     private ApplicationDbContext _db => Service;
+
+    private SearchVm _searchVm = new();
 
     private List<Company> _allCompanies = default!;
 
@@ -197,6 +201,7 @@
     private void citySelected(string val)
     {
         _selectedCity = val;
+        _selectedDistrict = null;
         _districts = _allCompanies.Where(x => x.City == _selectedCity).Select(x => x.District).Distinct().ToList();
         _districtDisabled = false;
     }
@@ -265,7 +270,7 @@
         _manifacturerDisabled = true;
     }
 
-    private async void search()
+    private async Task search()
     {
         string url = "/products";
         if (
@@ -315,6 +320,24 @@
             url += $"order={_selectedOrder}";
         }
 
-        _navigationManager.NavigateTo(url);
+        if (IsInPage)
+        {
+            await OnSearch.InvokeAsync(new SearchVm
+                {
+                    SearchTerm = _searchTerm,
+                    City = _selectedCity,
+                    District = _selectedDistrict,
+                    Company = _selectedCompany,
+                    Category = _selectedCategory,
+                    Manifacturer = _selectedManifacturer,
+                    SortBy = _selectedSortBy,
+                    OrderBy = _selectedOrder
+                });
+        }
+        else
+        {
+            _navigationManager.NavigateTo(url);
+        }
+
     }
 }

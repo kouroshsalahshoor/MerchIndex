@@ -1,93 +1,177 @@
 ﻿@page "/companies"
 
 @rendermode InteractiveServer
+@attribute [StreamRendering]
 
 <PageTitle>@_title</PageTitle>
-
-<style>
-    li > a {
-        text-decoration: none;
-    }
-
-    a {
-        color: white;
-    }
-
-    card h3, card p, card small {
-        text-shadow: 2px 2px black;
-    }
-</style>
-
-@* https://getbootstrap.com/docs/5.3/examples/features/ *@
 <h2 class="pb-2 border-bottom">@_title</h2>
 
-<_Paging TotalItems="10023" />
+@if (_loading)
+{
+    <div class="d-flex align-items-center justify-content-center">
+        <_Loading />
+    </div>
+}
 
-<div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+<div class="row g-2">
 
-    @foreach (var item in _items)
-    {
-        <div class="col">
+    <div class="col-md-8">
+        @* <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            xxx
+        </h3> *@
 
-            <div class="card card-cover h-100 overflow-hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('/images/demo/company.jpeg');">
-                <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                    <h3 class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">@item.Name</h3>
-                    <p class="fw-bold"><a href="company/@item.Id"><i class="bi bi-geo-alt"></i> @item.City @item.District</a></p>
-                    <ul class="d-flex list-unstyled mt-auto">
-                        <li class="me-auto" title="Produkter">
-                            <a href="products/company/@item.Id">
-                                <i class="bi bi-boxes"></i>
-                                @* <img src="https://github.com/twbs.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white"> *@
-                                <small>Produkter</small>
-                            </a>
-                        </li>
-                        <li class="d-flex align-items-center me-3" title="Email">
-                            <a href="company/@item.Id">
-                                <i class="bi bi-envelope"></i>
-                                <small>@item.Email</small>
-                            </a>
-                        </li>
-                        <li class="d-flex align-items-center" title="Tel">
-                            <a href="company/@item.Id">
-                                <i class="bi bi-headset"></i>
-                                <small>@item.Tel</small>
-                            </a>
-                        </li>
-                    </ul>
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
+
+            @foreach (var item in _items)
+            {
+                <div class="col my-3">
+                    <div class="card shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" height="200" style="object-fit:contain"
+                        src="@_imageService.GetUrl("companies", item.Id.ToString())" />
+                        <div class="card-body text-center">
+                            <p class="card-text fw-bold">@item.Name</p>
+                            @* <p class="card-text fst-italic"><strong>@item.Price</strong> kr</p> *@
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Name</small>
+                                <small class="text-body-secondary">@item.BusinessArea</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.City</small>
+                                <small class="text-body-secondary">@item.District</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Tel</small>
+                                <small class="text-body-secondary">@item.Email</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Address</small>
+                                <small class="text-body-secondary">@item.Url</small>
+                            </div>
+
+                            @* <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary">View</button>
+                            </div> *@
+                        </div>
+                    </div>
                 </div>
+            }
+        </div>
+
+        <_Paging TotalItems="@_totalItems" ItemsPerPage="@_pageSize" CurrentPage="@_page" OnPageChanged="pageChanged" />
+        @* <nav class="blog-pagination" aria-label="Pagination">
+            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
+            <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
+        </nav> *@
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="position-sticky" style="top: 2rem;">
+
+            <div class="p-4">
+                <h4 class="fst-italic"><strong> <i class="bi bi-search"></i> Sök </strong></h4>
+                <hr />
+
+                <_Search OnSearch="search" IsInPage="true" />
+
             </div>
 
         </div>
-    }
+    </div>
 
 </div>
 
 @code {
     private ApplicationDbContext _db => Service;
     private string _title = "Företag";
+    private List<Company> _items = new();
+    private bool _loading;
+    private SearchVm _searchVm = new();
 
-    private List<Company> _items { get; set; } = new();
+    //paging
+    private int _page = 1;
+    private int _pageSize = 12;
+    private int _totalItems = 0;
 
     protected override async Task OnInitializedAsync()
     {
-        // // _items = await _db.Companies.ToListAsync();
-        // for (int city = 1; city <= 10; city++)
-        // {
-        //     for (int district = 1; district <= 10; district++)
-        //     {
-        //         for (int i = 1; i <= 100; i++)
-        //         {
-        //             _items.Add(new Company
-        //                 {
-        //                     Name = $"Company {i}",
-        //                     City = $"City {city}",
-        //                     District = $"District {district}",
-        //                     Tel = $"Tel {i}",
-        //                     Email = $"Email {i}",
-        //                 });
-        //         }
-        //     }
-        // }
-        
+        await load();
+    }
+
+    private async Task load()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        var query = _db.Companies
+        .AsNoTracking()
+        .AsQueryable();
+
+        query = query
+        .Where(x =>
+        (
+            string.IsNullOrEmpty(_searchVm.SearchTerm) ||
+            x.Name.ToLower().Contains(_searchVm.SearchTerm)
+        ) &&
+            (string.IsNullOrEmpty(_searchVm.City) || x.City == _searchVm.City) &&
+            (string.IsNullOrEmpty(_searchVm.District) || x.District == _searchVm.District)
+        ).AsQueryable();
+
+        if (_searchVm.SortBy == "name")
+        {
+            if (_searchVm.OrderBy == "desc")
+            {
+                query = query.OrderByDescending(x => x.Name).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Name).AsQueryable();
+            }
+        }
+        else
+        {
+            if (_searchVm.OrderBy == "desc")
+            {
+                query = query.OrderByDescending(x => x.Id).AsQueryable();
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Id).AsQueryable();
+            }
+        }
+
+        _totalItems = await query.CountAsync();
+
+        query = query.Skip((_page - 1) * _pageSize)
+        .Take(_pageSize);
+
+        _items = await query.ToListAsync();
+
+        _loading = false;
+        StateHasChanged();
+
+    }
+
+    private async Task pageChanged(int page)
+    {
+        _page = page;
+        await _js.InvokeVoidAsync("ScrollToTop");
+
+        await load();
+    }
+
+    private async Task search(SearchVm vm)
+    {
+        _page = 1;
+        await _js.InvokeVoidAsync("ScrollToTop");
+
+        _searchVm = vm;
+        _searchVm.SearchTerm = string.IsNullOrEmpty(vm.SearchTerm) == false ? vm.SearchTerm.ToLower() : vm.SearchTerm;
+
+        await load();
     }
 }
