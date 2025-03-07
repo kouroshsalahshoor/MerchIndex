@@ -16,5 +16,6 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await _js.CloseMenu();
+        // await _js.InvokeVoidAsync("closeOffCanvas");
     }
 }

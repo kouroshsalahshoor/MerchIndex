@@ -64,3 +64,9 @@ window.openOffCanvas = function () {
     var bsOffcanvas = new bootstrap.Offcanvas(offcanvasNavbar)
     bsOffcanvas.show()
 }
+
+window.closeOffCanvas = function () {
+    var offcanvasNavbar = document.getElementById('offcanvasNavbar')
+    var bsOffcanvas = new bootstrap.Offcanvas(offcanvasNavbar)
+    bsOffcanvas.hide()
+}

@@ -15,7 +15,7 @@
                     <label for="InputSearch" class="form-label">Sök Text ....</label>
                 </div>
                 <button class="btn btn-warning text-light" @onclick="search" title="Sök" style="font-size: 28px;"
-                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
+                        data-bs-dismiss="offcanvas">
                     <i class="bi bi-search"></i>
                 </button>
                 <button class="btn btn-light text-danger" @onclick="@reset" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
@@ -44,10 +44,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedDistrict)"
-                             Value="@_selectedDistrict"
-                             ValueChanged="@(async (string value) => await districtSelected(value))"
-                             class="form-select" id="SelectDistrict"
-                             disabled="@_districtDisabled">
+                Value="@_selectedDistrict"
+                ValueChanged="@(async (string value) => await districtSelected(value))"
+                class="form-select" id="SelectDistrict"
+                disabled="@_districtDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _districts ?? new())
@@ -64,10 +64,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCompany)"
-                             Value="@_selectedCompany"
-                             ValueChanged="@((string value) => companySelected(value))"
-                             class="form-select" id="SelectCompany"
-                             disabled="@_companyDisabled">
+                Value="@_selectedCompany"
+                ValueChanged="@((string value) => companySelected(value))"
+                class="form-select" id="SelectCompany"
+                disabled="@_companyDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _companies ?? new())
@@ -84,10 +84,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCategory)"
-                             Value="@_selectedCategory"
-                             ValueChanged="@((string value) => categorySelected(value))"
-                             class="form-select" id="SelectCategory"
-                             disabled="@_categoryDisabled">
+                Value="@_selectedCategory"
+                ValueChanged="@((string value) => categorySelected(value))"
+                class="form-select" id="SelectCategory"
+                disabled="@_categoryDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _categories ?? new())
@@ -104,10 +104,10 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
-                             Value="@_selectedManifacturer"
-                             ValueChanged="@((string value) => manifacturerSelected(value))"
-                             class="form-select" id="SelectManifacturer"
-                             disabled="@_manifacturerDisabled">
+                Value="@_selectedManifacturer"
+                ValueChanged="@((string value) => manifacturerSelected(value))"
+                class="form-select" id="SelectManifacturer"
+                disabled="@_manifacturerDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _manifacturers ?? new())
@@ -124,9 +124,9 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedSortBy)"
-                             Value="@_selectedSortBy"
-                             ValueChanged="@((string value) => sortBySelected(value))"
-                             class="form-select" id="SelectSort">
+                Value="@_selectedSortBy"
+                ValueChanged="@((string value) => sortBySelected(value))"
+                class="form-select" id="SelectSort">
                     @* <option value="" selected>Id</option> *@
                     <option value="name" selected>Namn</option>
                     <option value="price">Pris</option>
@@ -139,9 +139,9 @@
         <div class="mb-1">
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedOrder)"
-                             Value="@_selectedOrder"
-                             ValueChanged="@((string value) => orderBySelected(value))"
-                             class="form-select" id="SelectOrder">
+                Value="@_selectedOrder"
+                ValueChanged="@((string value) => orderBySelected(value))"
+                class="form-select" id="SelectOrder">
                     <option value="" selected>Uppstigande</option>
                     <option value="desc">Nedåtgående</option>
                 </InputSelect>
@@ -265,7 +265,7 @@
         _manifacturerDisabled = true;
     }
 
-    private void search()
+    private async void search()
     {
         string url = "/products";
         if (
