@@ -11,10 +11,10 @@
     <div class="col-sm-12 col-md-6">
         <nav>
             <ul class="pagination">
-                <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(() => page(1))">
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(async () => await page(1))">
                     <button class="page-link" title="Första"><span aria-hidden="true">&laquo;</span></button>
                 </li>
-                <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(() => page(CurrentPage - 1))">
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : null)" @onclick="@(async () => await page(CurrentPage - 1))">
                     <button class="page-link" title="Förra"><span aria-hidden="true">&lsaquo;</span></button>
                 </li>
 
@@ -24,7 +24,7 @@
                     {
                         {
                             var index = i;
-                            <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                            <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(async () => await page(index))">
                                 <button class="page-link">@i</button>
                             </li>
                         }
@@ -38,37 +38,37 @@
                         {
                             {
                                 var index = i;
-                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(async () => await page(index))">
                                     <button class="page-link">@i</button>
                                 </li>
                             }
                         }
-                        <li class="page-item" @onclick="@(() => page((2 * Radius) + 2))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
+                        <li class="page-item" @onclick="@(async () => await page((2 * Radius) + 2))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
 
                     }
                     else if ((CurrentPage > (Radius + 1)) && CurrentPage <= (_totalPages - (Radius + 1)))
                     {
-                        <li class="page-item" @onclick="@(() => page((CurrentPage - Radius) - 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
+                        <li class="page-item" @onclick="@(async () => await page((CurrentPage - Radius) - 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
 
                         for (int i = CurrentPage - Radius; i <= CurrentPage + Radius; i++)
                         {
                             {
                                 var index = i;
-                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(async () => await page(index))">
                                     <button class="page-link">@i</button>
                                 </li>
                             }
                         }
-                        <li class="page-item" @onclick="@(() => page((CurrentPage + Radius) + 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
+                        <li class="page-item" @onclick="@(async () => await page((CurrentPage + Radius) + 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
                     }
                     else
                     {
-                        <li class="page-item" @onclick="@(() => page((_totalPages - (2 * Radius)) - 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
+                        <li class="page-item" @onclick="@(async () => await page((_totalPages - (2 * Radius)) - 1))"><button class="page-link"><i class="bi bi-three-dots"></i></button></li>
                         for (int i = _totalPages - (2 * Radius); i <= _totalPages; i++)
                         {
                             {
                                 var index = i;
-                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(() => page(index))">
+                                <li class="page-item @(CurrentPage == i ? "active" : null)" @onclick="@(async () => await page(index))">
                                     <button class="page-link">@i</button>
                                 </li>
                             }
@@ -76,10 +76,10 @@
                     }
                 }
 
-                <li class="page-item @(CurrentPage == _totalPages ? "disabled" : null)" @onclick="@(() => page(CurrentPage + 1))">
+                <li class="page-item @(CurrentPage == _totalPages ? "disabled" : null)" @onclick="@(async () => await page(CurrentPage + 1))">
                     <button class="page-link" title="Nästa"><span aria-hidden="true">&rsaquo;</span></button>
                 </li>
-                <li class="page-item" @onclick="@(() => page(_totalPages))">
+                <li class="page-item" @onclick="@(async () => await page(_totalPages))">
                     <button class="page-link @(CurrentPage == _totalPages ? "disabled" : null)" title="Sista"><span aria-hidden="true">&raquo;</span></button>
                 </li>
             </ul>
@@ -110,11 +110,13 @@
         _totalPages = (int)Math.Ceiling(TotalItems / (double)ItemsPerPage);
     }
 
-    private void page(int page)
+    private async Task page(int page)
     {
         CurrentPage = page < 1 ? 1 : page;
         CurrentPage = page > _totalPages ? _totalPages : page;
 
-        OnPageChanged.InvokeAsync(CurrentPage);
+        await _js.InvokeVoidAsync("ScrollToTop");
+
+        await OnPageChanged.InvokeAsync(CurrentPage);
     }
 }

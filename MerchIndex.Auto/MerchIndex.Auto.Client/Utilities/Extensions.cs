@@ -25,5 +25,10 @@ namespace MerchIndex.Auto.Client.Utilities
         {
             await js.InvokeVoidAsync("CloseMenu");
         }
+
+        //public static async Task ScrollToTop(this IJSRuntime js)
+        //{
+        //    await js.InvokeVoidAsync("ScrollToTop");
+        //}
     }
 }
