@@ -124,7 +124,7 @@
     private Message _model { get; set; } = new();
 
     private string _title = "Kontakt";
-    private bool _loading;
+    // private bool _loading;
     private bool _success;
 
     private List<string> _errors = new();
@@ -132,8 +132,8 @@
     private async Task submit()
     {
         _success = false;
-        _loading = true;
-        StateHasChanged();
+        // _loading = true;
+        // StateHasChanged();
 
         _errors.Clear();
 
@@ -156,7 +156,7 @@
             _errors.Add(e.Message);
         }
 
-        _loading = true;
-        StateHasChanged();
+        // _loading = true;
+        // StateHasChanged();
     }
 }

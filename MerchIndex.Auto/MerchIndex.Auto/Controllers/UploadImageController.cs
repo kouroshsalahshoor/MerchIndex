@@ -1,8 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MerchIndex.Auto.Client.Models;
-using MerchIndex.Auto.Data;
-using System.Runtime.CompilerServices;
 
 namespace MerchIndex.Auto.Controllers
 {
@@ -12,7 +8,7 @@ namespace MerchIndex.Auto.Controllers
     {
         //https://www.youtube.com/watch?v=tESVLxcD6Bw
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private ApplicationDbContext context;
+        //private ApplicationDbContext context;
         public UploadImageController(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;

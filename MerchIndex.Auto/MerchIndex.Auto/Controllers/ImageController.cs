@@ -11,7 +11,8 @@ namespace MerchIndex.Auto.Controllers
         [HttpPost("save")]
         public async Task<IActionResult> SaveImage([FromBody] ImageDataModel model)
         {
-            if (model == null || string.IsNullOrEmpty(model.ImageData))
+            //if (model == null || string.IsNullOrEmpty(model.ImageData))
+            if (model == null)
             {
                 return BadRequest();
             }

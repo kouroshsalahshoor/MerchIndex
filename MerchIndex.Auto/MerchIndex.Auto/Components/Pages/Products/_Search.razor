@@ -10,11 +10,12 @@
         <div class="mb-3">
             <div class="input-group">
                 <div class="form-floating">
-                    <input class="form-control" id="InputSearch" placeholder="" @bind-value="@_searchTerm" @oninput="search">
+                    <input class="form-control" id="InputSearch" placeholder="" @bind-value="@_searchTerm">
+                    @* <input class="form-control" id="InputSearch" placeholder="" @bind-value="@_searchTerm" @oninput="setSearchTerm"> *@
                     <label for="InputSearch" class="form-label">Sök Text ....</label>
                 </div>
-                <button class="btn btn-warning text-light" @onclick="@(async() => await load())" title="Sök" style="font-size: 28px;"><i class="bi bi-search"></i></button>
-                <button class="btn btn-light text-danger" @onclick="@(async() => await init())" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
+                <button class="btn btn-warning text-light" @onclick="search" title="Sök" style="font-size: 28px;"><i class="bi bi-search"></i></button>
+                <button class="btn btn-light text-danger" @onclick="@reset" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
             </div>
         </div>
 
@@ -22,7 +23,7 @@
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCity)"
                              Value="@_selectedCity"
-                             ValueChanged="@(async (string value) => await citySelected(value))"
+                             ValueChanged="@((string value) => citySelected(value))"
                              class="form-select" id="SelectCity">
                     <option value="">Alla</option>
 
@@ -42,7 +43,8 @@
                 <InputSelect ValueExpression="@(()=>_selectedDistrict)"
                              Value="@_selectedDistrict"
                              ValueChanged="@(async (string value) => await districtSelected(value))"
-                             class="form-select" id="SelectDistrict">
+                             class="form-select" id="SelectDistrict"
+                             disabled="@_districtDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _districts ?? new())
@@ -60,8 +62,9 @@
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCompany)"
                              Value="@_selectedCompany"
-                             ValueChanged="@(async (string value) => await companySelected(value))"
-                             class="form-select" id="SelectCompany">
+                             ValueChanged="@((string value) => companySelected(value))"
+                             class="form-select" id="SelectCompany"
+                             disabled="@_companyDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _companies ?? new())
@@ -79,8 +82,9 @@
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedCategory)"
                              Value="@_selectedCategory"
-                             ValueChanged="@(async (string value) => await categorySelected(value))"
-                             class="form-select" id="SelectCategory">
+                             ValueChanged="@((string value) => categorySelected(value))"
+                             class="form-select" id="SelectCategory"
+                             disabled="@_categoryDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _categories ?? new())
@@ -98,8 +102,9 @@
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
                              Value="@_selectedManifacturer"
-                             ValueChanged="@(async (string value) => await manifacturerSelected(value))"
-                             class="form-select" id="SelectManifacturer">
+                             ValueChanged="@((string value) => manifacturerSelected(value))"
+                             class="form-select" id="SelectManifacturer"
+                             disabled="@_manifacturerDisabled">
                     <option value="">Alla</option>
 
                     @foreach (var item in _manifacturers ?? new())
@@ -117,10 +122,10 @@
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedSortBy)"
                              Value="@_selectedSortBy"
-                             ValueChanged="@(async (string value) => await sortBySelected(value))"
+                             ValueChanged="@((string value) => sortBySelected(value))"
                              class="form-select" id="SelectSort">
-                    <option value="" selected>Id</option>
-                    <option value="name">Namn</option>
+                    @* <option value="" selected>Id</option> *@
+                    <option value="name" selected>Namn</option>
                     <option value="price">Pris</option>
                     <option value="category">Kategori</option>
                     <option value="manifacturer">Tillverkare</option>
@@ -132,7 +137,7 @@
             <div class="form-floating">
                 <InputSelect ValueExpression="@(()=>_selectedOrder)"
                              Value="@_selectedOrder"
-                             ValueChanged="@(async (string value) => await orderBySelected(value))"
+                             ValueChanged="@((string value) => orderBySelected(value))"
                              class="form-select" id="SelectOrder">
                     <option value="" selected>Uppstigande</option>
                     <option value="desc">Nedåtgående</option>
@@ -150,187 +155,97 @@
 
     private ApplicationDbContext _db => Service;
 
+    private List<Company> _allCompanies = default!;
+
+    private string? _searchTerm;
+
     private List<string> _cities = new();
     private string? _selectedCity;
+
     private List<string> _districts = new();
     private string? _selectedDistrict;
+    private bool _districtDisabled = true;
+
     private List<string> _companies = new();
     private string? _selectedCompany;
+    private bool _companyDisabled = true;
 
     private List<string> _categories = new();
     private string? _selectedCategory;
+    private bool _categoryDisabled = true;
+
     private List<string> _manifacturers = new();
     private string? _selectedManifacturer;
+    private bool _manifacturerDisabled = true;
 
     private string? _selectedSortBy;
     private string? _selectedOrder;
 
-    private string? _searchTerm;
-
     protected override async Task OnInitializedAsync()
     {
-        await init();
+        reset();
+
+        _allCompanies = await _db.Companies.AsNoTracking().ToListAsync();
+
+        //fill cities
+        _cities = _allCompanies.Select(x => x.City).Distinct().OrderBy(x => x).ToList();
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (string.IsNullOrEmpty(SearchTerm) == false)
-        {
-            _searchTerm = SearchTerm.Trim().ToLower();
-
-            await load();
-        }
-    }
-
-    private async Task load()
-    {
-        // _loading = true;
-        // StateHasChanged();
-
-        var query = _db.Products
-        .Include(x => x.Company)
-        .AsNoTracking()
-        .AsQueryable();
-
-        query = query
-        .Where(x =>
-        (
-            string.IsNullOrEmpty(_searchTerm) ||
-            x.Name.ToLower().Contains(_searchTerm) ||
-            x.Price.ToString().Contains(_searchTerm) ||
-            x.Category.ToLower().Contains(_searchTerm)
-        ) &&
-            (string.IsNullOrEmpty(_selectedCity) || x.Company.City == _selectedCity) &&
-            (string.IsNullOrEmpty(_selectedDistrict) || x.Company.District == _selectedDistrict) &&
-            (string.IsNullOrEmpty(_selectedCompany) || x.Company.Name == _selectedCompany) &&
-            (string.IsNullOrEmpty(_selectedCategory) || x.Category == _selectedCategory) &&
-            (string.IsNullOrEmpty(_selectedManifacturer) || x.Manifacturer == _selectedManifacturer)
-        ).AsQueryable();
-
-        if (_selectedSortBy == "name")
-        {
-            if (_selectedOrder == "desc")
-            {
-                query = query.OrderByDescending(x => x.Name).AsQueryable();
-            }
-            else
-            {
-                query = query.OrderBy(x => x.Name).AsQueryable();
-            }
-        }
-        else if (_selectedSortBy == "price")
-        {
-            if (_selectedOrder == "desc")
-            {
-                query = query.OrderByDescending(x => x.Price).AsQueryable();
-            }
-            else
-            {
-                query = query.OrderBy(x => x.Price).AsQueryable();
-            }
-        }
-        else if (_selectedSortBy == "category")
-        {
-            if (_selectedOrder == "desc")
-            {
-                query = query.OrderByDescending(x => x.Category).AsQueryable();
-            }
-            else
-            {
-                query = query.OrderBy(x => x.Category).AsQueryable();
-            }
-        }
-        else if (_selectedSortBy == "manifacturer")
-        {
-            if (_selectedOrder == "desc")
-            {
-                query = query.OrderByDescending(x => x.Manifacturer).AsQueryable();
-            }
-            else
-            {
-                query = query.OrderBy(x => x.Manifacturer).AsQueryable();
-            }
-        }
-        else
-        {
-            if (_selectedOrder == "desc")
-            {
-                query = query.OrderByDescending(x => x.Id).AsQueryable();
-            }
-            else
-            {
-                query = query.OrderBy(x => x.Id).AsQueryable();
-            }
-        }
-
-        // _totalItems = await query.CountAsync();
-
-        //fill dropdowns
-        _districts = await query.Select(x => x.Company.District).Distinct().ToListAsync();
-        _companies = await query.Select(x => x.Company.Name!).Distinct().ToListAsync();
-        _manifacturers = await query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
-        _categories = await query.Select(x => x.Category).Distinct().ToListAsync();
-
-        // query = query.Skip((_page - 1) * _pageSize)
-        // .Take(_pageSize);
-
-        // _items = await query.ToListAsync();
-
-        // _loading = false;
-        // StateHasChanged();
-    }
-
-    private async Task citySelected(string val)
+    private void citySelected(string val)
     {
         _selectedCity = val;
+        _districts = _allCompanies.Where(x => x.City == _selectedCity).Select(x => x.District).Distinct().ToList();
+        _districtDisabled = false;
     }
     private async Task districtSelected(string val)
     {
         _selectedDistrict = val;
+
+        //fill dropdowns
+        _companies = _allCompanies.Where(x => x.District == _selectedDistrict).Select(x => x.Name!).Distinct().ToList();
+        _manifacturers = await _db.Products.Select(x => x.Manifacturer!).Distinct().ToListAsync();
+        _categories = await _db.Products.Select(x => x.Category).Distinct().ToListAsync();
+
+        _companyDisabled = false;
+        _categoryDisabled = false;
+        _manifacturerDisabled = false;
     }
-    private async Task companySelected(string val)
+    private void companySelected(string val)
     {
         _selectedCompany = val;
     }
 
-    private async Task categorySelected(string val)
+    private void categorySelected(string val)
     {
         _selectedCategory = val;
     }
 
-    private async Task manifacturerSelected(string val)
+    private void manifacturerSelected(string val)
     {
         _selectedManifacturer = val;
     }
 
-    private async Task sortBySelected(string val)
+    private void sortBySelected(string val)
     {
         _selectedSortBy = val;
     }
 
-    private async Task orderBySelected(string val)
+    private void orderBySelected(string val)
     {
         _selectedOrder = val;
     }
 
-    private async Task search(ChangeEventArgs e)
+    private void setSearchTerm(ChangeEventArgs e)
     {
         _searchTerm = (string)e.Value!;
     }
 
-    private async Task init()
+    private void reset()
     {
-        var query = _db.Products
-        .Include(x => x.Company)
-        .AsNoTracking()
-        .AsQueryable();
-
-        _cities = await query.Select(x => x.Company.City).Distinct().ToListAsync();
-        _companies = await query.Select(x => x.Company.Name).Distinct().ToListAsync();
-        _categories = await query.Select(x => x.Category).Distinct().ToListAsync();
-        _manifacturers = await query.Select(x => x.Manifacturer!).Distinct().ToListAsync();
-
         _districts.Clear();
+        _companies.Clear();
+        _categories.Clear();
+        _manifacturers.Clear();
 
         _searchTerm = default;
         _selectedCity = default;
@@ -341,7 +256,62 @@
         _selectedSortBy = default;
         _selectedOrder = default;
 
-        await load();
+        _districtDisabled = true;
+        _companyDisabled = true;
+        _categoryDisabled = true;
+        _manifacturerDisabled = true;
     }
 
+    private void search()
+    {
+        string url = "/products";
+        if (
+            string.IsNullOrEmpty(_searchTerm) == false ||
+            string.IsNullOrEmpty(_selectedCity) == false ||
+            string.IsNullOrEmpty(_selectedDistrict) == false ||
+            string.IsNullOrEmpty(_selectedCompany) == false ||
+            string.IsNullOrEmpty(_selectedCategory) == false ||
+            string.IsNullOrEmpty(_selectedManifacturer) == false ||
+            string.IsNullOrEmpty(_selectedSortBy) == false ||
+            string.IsNullOrEmpty(_selectedOrder) == false
+        )
+        {
+            url += "?";
+        }
+
+        if (string.IsNullOrEmpty(_searchTerm) == false)
+        {
+            url += $"searchterm={_searchTerm}";
+        }
+        if (string.IsNullOrEmpty(_selectedCity) == false)
+        {
+            url += $"city={_selectedCity}";
+        }
+        if (string.IsNullOrEmpty(_selectedDistrict) == false)
+        {
+            url += $"district={_selectedDistrict}";
+        }
+        if (string.IsNullOrEmpty(_selectedCompany) == false)
+        {
+            url += $"company={_selectedCompany}";
+        }
+        if (string.IsNullOrEmpty(_selectedCategory) == false)
+        {
+            url += $"category={_selectedCategory}";
+        }
+        if (string.IsNullOrEmpty(_selectedManifacturer) == false)
+        {
+            url += $"manifacturer={_selectedManifacturer}";
+        }
+        if (string.IsNullOrEmpty(_selectedSortBy) == false)
+        {
+            url += $"sortby={_selectedSortBy}";
+        }
+        if (string.IsNullOrEmpty(_selectedOrder) == false)
+        {
+            url += $"order={_selectedOrder}";
+        }
+
+        _navigationManager.NavigateTo(url);
+    }
 }

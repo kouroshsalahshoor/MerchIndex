@@ -180,8 +180,8 @@
 
     private async Task deleteImage(FileInfo fileInfo)
     {
-        // if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
-        // {
+        if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
+        {
         //     // $"/images/products/{_model.Id}/{fileInfo.Name}
         //     var filePath = Path.Combine(_dir, _model.Id.ToString()!, fileInfo.Name);
         //     if (File.Exists(filePath))
@@ -189,6 +189,6 @@
         //         File.Delete(filePath);
         //         _productFileInfos?.Remove(fileInfo);
         //     }
-        // }
+        }
     }
 }
