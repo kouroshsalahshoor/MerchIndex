@@ -12,6 +12,7 @@ using MerchIndex.Auto.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ServiceCollectionExtensions;
 using Persilsoft.Nominatim.Geolocation.Blazor;
+using MerchIndex.Auto.Services.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +95,20 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 // register server-based implementation to integrate with an API
 builder.Services.AddScoped<IApiService, ServerApiService>();
 
+// Allow requests from the Blazor WASM host from JavaScript (JS interop is used
+// by WASM) 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAnyOrigin",
+                      policy =>
+                      {
+                          policy
+                          .AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                      });
+});
+
 builder.Services.AddHttpClient("LocalAPIClient", cfg =>
 {
     cfg.BaseAddress = new Uri(
@@ -156,6 +171,8 @@ app.UseMigrationsEndPoint();
 //{
 //    options.AddSupportedCultures("en-US").AddSupportedUICultures("en-US").SetDefaultCulture("en-US");
 //});
+
+app.UseCors("AllowAnyOrigin");
 
 app.UseHttpsRedirection();
 

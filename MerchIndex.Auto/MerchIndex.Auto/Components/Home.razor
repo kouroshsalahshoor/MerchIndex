@@ -1,4 +1,4 @@
-﻿@page "/home"
+﻿@page "/"
 @* @page "/index/{searchTerm}" *@
 
 @rendermode InteractiveServer
@@ -6,9 +6,16 @@
 
 <PageTitle>@_title</PageTitle>
 
-<h1 class="text-center">Produkter</h1>
+<div class="row text-center" style="min-height: 50vh;">
+    <div class="col-md-6 col-md-offset-3 m-auto">
+        <div class="mb-3">
+            <img src="images/merchindex.png" width="200" alt="MerchIndex" />
+        </div>
 
-<_Products />
+        <_Search />
+
+    </div>
+</div>
 
 @code {
     private string _title = "Hem";

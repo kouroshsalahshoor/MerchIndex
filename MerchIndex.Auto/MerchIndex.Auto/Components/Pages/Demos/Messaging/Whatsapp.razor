@@ -1,0 +1,36 @@
+﻿@page "/demos/whatsapp"
+
+@inject NavigationManager _navigationManager
+
+
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>Whatsapp</PageTitle>
+
+<h1>Whatsapp</h1>
+
+to:
+<input id="to" @bind="@To" class="input-group-text" />
+text:
+<input id="text" @bind="Text" class="input-group-text" />
+
+@code {
+    private string To = "+46700284002";
+    private string Text = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var whatsappUrl = "https://api.whatsapp.com/send?phone=+46700284002&text=Hello!!!!";
+            _navigationManager.NavigateTo(whatsappUrl, true);
+
+            // System.Diagnostics.Process.Start("https://api.whatsapp.com/send?phone=+46700284002&text=Hello!!!!");
+        }
+        catch (Exception)
+        {
+        }
+
+    }
+}

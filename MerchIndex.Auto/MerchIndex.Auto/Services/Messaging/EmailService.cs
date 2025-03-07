@@ -1,7 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Net;
 
-namespace MerchIndex.Auto.Services
+namespace MerchIndex.Auto.Services.Messaging
 {
     public class EmailService
     {

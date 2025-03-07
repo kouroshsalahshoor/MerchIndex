@@ -1,7 +1,7 @@
 ﻿using Nexmo.Api.Messaging;
 using Nexmo.Api.Request;
 
-namespace MerchIndex.Auto.Services
+namespace MerchIndex.Auto.Services.Messaging
 {
     //https://developer.vonage.com/en/api/sms
     public class SmsService

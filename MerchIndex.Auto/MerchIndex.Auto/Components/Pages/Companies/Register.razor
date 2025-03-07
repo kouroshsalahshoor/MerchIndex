@@ -22,7 +22,7 @@
 @inject RoleManager<IdentityRole> RoleManager
 
 <PageTitle>@_title</PageTitle>
-<h2 class="pb-2 border-bottom">@_title</h2>
+<h2 class="pb-2 border-bottom"><i class="bi bi-person-plus"></i> @_title</h2>
 
 <div class="my-3">
     <EditForm Model="Input" method="post" OnValidSubmit="submit" FormName="register" class="row g-3">
@@ -44,7 +44,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.CompanyName" class="form-control" id="Input.CompanyName" placeholder="" />
-                <label for="Input.CompanyName">FöretagsNamn</label>
+                <label for="Input.CompanyName"><i class="bi bi-building"></i> FöretagsNamn</label>
                 <ValidationMessage For="() => Input.CompanyName" class="text-danger" />
             </div>
         </div>
@@ -53,7 +53,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.BusinessArea" class="form-control" id="Input.BusinessArea" placeholder="" />
-                <label for="Input.BusinessArea">Business område</label>
+                <label for="Input.BusinessArea"><i class="bi bi-briefcase"></i> Business område</label>
                 <ValidationMessage For="() => Input.BusinessArea" class="text-danger" />
             </div>
         </div>
@@ -62,7 +62,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.Email" class="form-control" id="Input.Email" placeholder="" />
-                <label for="Input.Email">Email (User Name)</label>
+                <label for="Input.Email"><i class="bi bi-envelope"></i> Email (User Name)</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
         </div>
@@ -71,7 +71,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.PhoneNumber" class="form-control" id="Input.PhoneNumber" placeholder="" />
-                <label for="Input.PhoneNumber">Telefon</label>
+                <label for="Input.PhoneNumber"><i class="bi bi-telephone"></i> Telefon</label>
                 <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
             </div>
         </div>
@@ -80,7 +80,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.Password" class="form-control" id="Input.Password" placeholder="" />
-                <label for="Input.Password">Password</label>
+                <label for="Input.Password"><i class="bi bi-key"></i> Password</label>
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
             </div>
         </div>
@@ -89,7 +89,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.ConfirmPassword" class="form-control" id="Input.ConfirmPassword" placeholder="" />
-                <label for="Input.ConfirmPassword">Bekräfta Password</label>
+                <label for="Input.ConfirmPassword"><i class="bi bi-key"></i> Bekräfta Password</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
         </div>
@@ -98,7 +98,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.Address" class="form-control" id="Input.Address" placeholder="" />
-                <label for="Input.Address">Adress</label>
+                <label for="Input.Address"><i class="bi bi-geo-alt"></i> Adress</label>
                 <ValidationMessage For="() => Input.Address" class="text-danger" />
             </div>
         </div>
@@ -107,7 +107,7 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.District" class="form-control" id="Input.District" placeholder="" />
-                <label for="Input.District">Stadsdel</label>
+                <label for="Input.District"><i class="bi bi-geo-alt"></i> Stadsdel</label>
                 <ValidationMessage For="() => Input.District" class="text-danger" />
             </div>
         </div>
@@ -116,14 +116,23 @@
             <div class="form-floating mb-3">
 
                 <InputText @bind-Value="Input.City" class="form-control" id="Input.City" placeholder="" />
-                <label for="Input.City">Stad</label>
+                <label for="Input.City"><i class="bi bi-geo-alt"></i> Stad</label>
                 <ValidationMessage For="() => Input.City" class="text-danger" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating mb-3">
+
+                <InputText @bind-Value="Input.Url" class="form-control" id="Input.Url" placeholder="" />
+                <label for="Input.Url"><i class="bi bi-globe"></i> Url</label>
+                <ValidationMessage For="() => Input.Url" class="text-danger" />
             </div>
         </div>
 
         <div class="col-lg-6 col-md-6 col-12">
             <div class="form-group">
-                <label>Företagets Logo</label>
+                <label><i class="bi bi-image"></i> Företagets Logo</label>
                 <InputFile id="Image" OnChange="setUploadingFiles" accept="image/*" class="form-control" />
                 @* <label for="Image">Upload Image</label> *@
 
@@ -136,8 +145,8 @@
             </div>
         </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary w-100">Spara</button>
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-warning btn-lg w-75"><i class="bi bi-person-add"></i> Registrera</button>
         </div>
     </EditForm>
 </div>
@@ -377,5 +386,8 @@
         [Required]
         [Display(Name = "City")]
         public string City { get; set; } = string.Empty;
+        [Required]
+        [Display(Name = "Hemsida")]
+        public string? Url { get; set; } = string.Empty;
     }
 }

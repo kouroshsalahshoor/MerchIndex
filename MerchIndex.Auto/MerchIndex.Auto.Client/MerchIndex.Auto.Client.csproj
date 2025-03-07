@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Content Remove="Pages\Demos\Location\_Location.razor" />
+    <Content Remove="Pages\Home.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,9 +23,6 @@
 
   <ItemGroup>
     <Content Update="Components\_Loading.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Update="Pages\Home.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
   </ItemGroup>
