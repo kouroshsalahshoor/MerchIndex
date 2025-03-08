@@ -20,7 +20,7 @@ namespace MerchIndex.Auto.Client.Models
         public string? Manifacturer { get; set; }
         public string? ImageUrl { get; set; }
         public int CompanyId { get; set; }
-        public Company? Company { get; set; }
+        public Company Company { get; set; }
 
         public int PercentOff { get; set; }
         public bool IsNew { get; set; }

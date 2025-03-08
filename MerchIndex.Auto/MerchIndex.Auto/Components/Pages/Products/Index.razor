@@ -1,5 +1,4 @@
 ﻿@page "/products"
-@page "/products/{searchTerm}"
 
 @rendermode InteractiveServer
 @attribute [StreamRendering]
@@ -7,16 +6,217 @@
 <PageTitle>@_title</PageTitle>
 <h2 class="pb-2 border-bottom">@_title</h2>
 
-<_Products SearchTerm="@SearchTerm" />
+@if (_loading)
+{
+    <div class="d-flex align-items-center justify-content-center">
+        <_Loading />
+    </div>
+}
+
+<div class="row g-2">
+
+    <div class="col-md-8">
+        @* <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            xxx
+        </h3> *@
+
+        @* <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3" style="overflow-y: scroll; height:70vh;"> *@
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 g-3">
+
+            @foreach (var item in _items)
+            {
+                <div class="col my-3">
+                    <div class="card shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" src="@item.ImageUrl" />
+                        <div class="card-body text-center">
+                            <p class="card-text fw-bold">@item.Name</p>
+                            <p class="card-text fst-italic"><strong>@item.Price.ToString()</strong> kr</p>
+                            @* <p class="card-text fst-italic"><strong>@item.Price.ToString("c")</strong></p> *@
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Company.Name</small>
+                                <small class="text-body-secondary">@item.Category</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Company.City</small>
+                                <small class="text-body-secondary">@item.Company.District</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-body-secondary">@item.Manifacturer</small>
+                                <small class="text-body-secondary"></small>
+                            </div>
+
+                            @* <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary">View</button>
+                            </div> *@
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <_Paging TotalItems="@_totalItems" CurrentPage="@_page" OnPageChanged="pageChanged" />
+        @* <nav class="blog-pagination" aria-label="Pagination">
+            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
+            <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
+        </nav> *@
+
+    </div>
+
+    <div class="col-md-4">
+        <div class="position-sticky" style="top: 2rem;">
+
+            <div class="p-4">
+                <h4 class="fst-italic"><strong> <i class="bi bi-search"></i> Sök </strong></h4>
+                <hr />
+
+                <_Search IsInPage="true" OnSearch="search" />
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
 
 @code {
-    [Parameter] public string? SearchTerm { get; set; }
+    private ApplicationDbContext _db => Service;
 
     private string _title = "Produkter";
+    private List<Product> _items { get; set; } = new();
+    private bool _loading;
+
+    //paging
+    private int _page = 1;
+    private int _pageSize = 12;
+    private int _totalItems = 0;
+
+    private SearchVm _searchVm = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await _js.CloseMenu();
-        // await _js.InvokeVoidAsync("closeOffCanvas");
+        if (firstRender)
+        {
+            // await _js.CloseMenu();
+            // await _js.InvokeVoidAsync("closeOffCanvas");
+
+            await load();
+        }
+    }
+
+    private async Task load()
+    {
+        // _loading = true;
+        // StateHasChanged();
+
+        try
+        {
+            var query = _db.Products
+            .Include(x => x.Company)
+            .AsNoTracking()
+            .AsQueryable();
+
+            query = query
+            .Where(x =>
+            (
+                string.IsNullOrEmpty(_searchVm.SearchTerm) ||
+                x.Name.ToLower().Contains(_searchVm.SearchTerm.ToString().ToLower()) ||
+                x.Price.ToString().ToLower().Contains(_searchVm.SearchTerm.ToString().ToLower()) ||
+                x.Category.ToLower().Contains(_searchVm.SearchTerm.ToString().ToLower())
+            ) &&
+                (string.IsNullOrEmpty(_searchVm.City) || x.Company!.City == _searchVm.City) &&
+                (string.IsNullOrEmpty(_searchVm.District) || x.Company!.District == _searchVm.District) &&
+                (string.IsNullOrEmpty(_searchVm.Company) || x.Company!.Name == _searchVm.Company) &&
+                (string.IsNullOrEmpty(_searchVm.Category) || x.Category == _searchVm.Category) &&
+                (string.IsNullOrEmpty(_searchVm.Manifacturer) || x.Manifacturer == _searchVm.Manifacturer)
+            ).AsQueryable();
+
+            if (_searchVm.SortBy == "name")
+            {
+                if (_searchVm.OrderBy == "desc")
+                {
+                    query = query.OrderByDescending(x => x.Name).AsQueryable();
+                }
+                else
+                {
+                    query = query.OrderBy(x => x.Name).AsQueryable();
+                }
+            }
+            else if (_searchVm.SortBy == "price")
+            {
+                if (_searchVm.OrderBy == "desc")
+                {
+                    query = query.OrderByDescending(x => x.Price).AsQueryable();
+                }
+                else
+                {
+                    query = query.OrderBy(x => x.Price).AsQueryable();
+                }
+            }
+            else if (_searchVm.SortBy == "category")
+            {
+                if (_searchVm.OrderBy == "desc")
+                {
+                    query = query.OrderByDescending(x => x.Category).AsQueryable();
+                }
+                else
+                {
+                    query = query.OrderBy(x => x.Category).AsQueryable();
+                }
+            }
+            else if (_searchVm.SortBy == "manifacturer")
+            {
+                if (_searchVm.OrderBy == "desc")
+                {
+                    query = query.OrderByDescending(x => x.Manifacturer).AsQueryable();
+                }
+                else
+                {
+                    query = query.OrderBy(x => x.Manifacturer).AsQueryable();
+                }
+            }
+            else
+            {
+                if (_searchVm.OrderBy == "desc")
+                {
+                    query = query.OrderByDescending(x => x.Id).AsQueryable();
+                }
+                else
+                {
+                    query = query.OrderBy(x => x.Id).AsQueryable();
+                }
+            }
+
+            _totalItems = await query.CountAsync();
+
+            query = query.Skip((_page - 1) * _pageSize)
+            .Take(_pageSize);
+
+            _items = await query.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            await _js.ToastrError(e.Message);
+        }
+
+        // await _js.InvokeVoidAsync("ScrollToTop");
+
+        // _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task pageChanged(int page)
+    {
+        _page = page;
+        await load();
+    }
+
+    private async Task search(SearchVm vm)
+    {
+        _page = 1;
+        _searchVm = vm;
+        await load();
     }
 }

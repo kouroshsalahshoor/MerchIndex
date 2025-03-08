@@ -45,7 +45,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartLine");
+                    b.ToTable("CartLine", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Category", b =>
@@ -62,7 +62,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
 
                     b.HasData(
                         new
@@ -136,7 +136,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Department", b =>
@@ -153,7 +153,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Location", b =>
@@ -174,7 +174,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Message", b =>
@@ -217,7 +217,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Order", b =>
@@ -265,7 +265,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Person", b =>
@@ -296,7 +296,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("People");
+                    b.ToTable("People", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Product", b =>
@@ -347,7 +347,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Client.Models.Subscription", b =>
@@ -364,7 +364,7 @@ namespace MerchIndex.Auto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("MerchIndex.Auto.Data.ApplicationUser", b =>
