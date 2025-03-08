@@ -1,9 +1,10 @@
-﻿@page "/admin/product/update/{id:long}"
-@page "/admin/product/create"
-@rendermode InteractiveServer
-@attribute [Authorize]
+﻿@page "/admin/product/create"
+@page "/admin/company/{companyId:int}/product/create"
+@page "/admin/company/{companyId:int}/product/update/{id:long}"
 
-@inject IWebHostEnvironment _env
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = Constants.Role_Admins + ", " + Constants.Role_CompanyAdmins)]
+@attribute [StreamRendering]
 
 <PageTitle>@_title</PageTitle>
 <h2 class="pb-2 border-bottom">@_title</h2>
@@ -69,97 +70,102 @@
         }
     </div>
     <div class="mt-1">
-        <button type="submit" class="btn btn-@(Id == 0 ? "primary" : "warning")" title="Save"><i class="bi bi-floppy"></i> Save</button>
+        <button type="submit" class="btn btn-@(Id == 0 ? "primary" : "warning")  w-50" title="Save"><i class="bi bi-floppy"></i> Save</button>
         <NavLink class="btn btn-light" href="/admin/products" title="Back to List"><i class="bi bi-list"></i>Back to List</NavLink>
     </div>
 </EditForm>
 
 @code {
     private ApplicationDbContext _db => Service;
-    [Parameter] public long Id { get; set; } = 0;
+    [Parameter] public long Id { get; set; }
+    [Parameter] public int CompanyId { get; set; }
+
+    private ClaimsPrincipal _currentUser = default!;
 
     private string _title = "Products";
     private Product _model { get; set; } = new();
 
     private bool _loading;
-    private string _dirName = "Companies"; 
+    private string _dirName = "Companies";
     // private string _dir = string.Empty;
-    private IReadOnlyList<IBrowserFile>? _uploadingFiles;
+    private List<IBrowserFile>? _uploadingFiles;
     private List<FileInfo>? _fileInfos = new();
 
-    // protected override Task OnInitializedAsync()
-    // {
-    //     // _dirName = Path.Combine(_env.WebRootPath, "images", "products");
-    //     // _dir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
-    //     // if (Directory.Exists(_dir) == false)
-    //     // {
-    //     //     Directory.CreateDirectory(_dir);
-    //     // }
-
-    //     return base.OnInitializedAsync();
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        _currentUser = (await _authenticationStateProvider!.GetAuthenticationStateAsync()).User;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
-        _title = Id == 0 ? "Create" : "Update";
-        if (Id != 0)
+        _title += (Id == 0 ? " Create" : " Update");
+        if (Id == 0)
+        {
+            if (CompanyId == 0)
+            {
+                var company = await _db.Companies.FirstOrDefaultAsync(c => c.Email == _currentUser.Identity!.Name);
+                if (company is not null)
+                {
+                    _model.CompanyId = company.Id;
+                }
+            }
+            else
+            {
+                _model.CompanyId = CompanyId;
+            }
+        }
+        else
         {
             _model = _db.Products.FirstOrDefault(p => p.Id == Id) ?? new();
-            _imageService.GetFileInfos(_dirName, Id.ToString());
+            _fileInfos = _imageService.GetFileInfos(_dirName, Id.ToString());
         }
     }
 
     private async Task submit()
     {
-        if (Id == 0)
+        _loading = true;
+        StateHasChanged();
+
+        try
         {
-            _db.Products.Add(_model);
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            if (Id == 0)
+            {
+                _db.Products.Add(_model);
+            }
+            else
+            {
+                _db.Products.Update(_model);
+            }
+
+            await _db.SaveChangesAsync();
+
+            if (_uploadingFiles is not null && _uploadingFiles!.Any())
+            {
+                await _imageService.UploadFiles(_dirName, _model.Id.ToString()!, _uploadingFiles!);
+
+                _model.ImageUrl = _imageService.GetUrl(_dirName, _model.Id.ToString()!);
+                await _db.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
+
+            await _js.ToastrSuccess(Constants.SaveSuccess);
+
+            _navigationManager?.NavigateTo("/admin/products");
         }
-        else
+        catch (Exception e)
         {
-            _db.Products.Update(_model);
+            await _js.ToastrError(e.Message);
         }
 
-        await _db.SaveChangesAsync();
-
-        if (_uploadingFiles is not null && _uploadingFiles!.Any())
-        {
-            await uploadFiles();
-        }
-
-        _navigationManager?.NavigateTo("/admin/products");
+        _loading = false;
+        StateHasChanged();
     }
 
     private void loadFiles(InputFileChangeEventArgs e)
     {
-        _uploadingFiles = e.GetMultipleFiles();
-    }
-
-    private async Task uploadFiles()
-    {
-        // _loading = true;
-        // StateHasChanged();
-
-        // var dir = _imageService.GetUrl(_dirName, _model.Id.ToString()!);
-        // // var productDir = Path.Combine(_dir, _model.Id.ToString()!);
-        // // if (Directory.Exists(productDir) == false)
-        // // {
-        // //     Directory.CreateDirectory(productDir);
-        // // }
-
-        // foreach (var file in _uploadingFiles!)
-        // {
-        //     var fileInfo = new FileInfo(file.Name);
-
-        //     var newFileName = $"{Guid.NewGuid()}{fileInfo.Extension}";
-        //     var newFilePath = Path.Combine(productDir, newFileName);
-
-        //     await using var fs = new FileStream(newFilePath, FileMode.Create);
-        //     await file.OpenReadStream(file.Size).CopyToAsync(fs);
-
-        // }
-        // _loading = false;
-        // StateHasChanged();
+        _uploadingFiles = e.GetMultipleFiles().ToList();
     }
 
     // private async Task getAllImagesInDir()
@@ -182,13 +188,13 @@
     {
         if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
         {
-        //     // $"/images/products/{_model.Id}/{fileInfo.Name}
-        //     var filePath = Path.Combine(_dir, _model.Id.ToString()!, fileInfo.Name);
-        //     if (File.Exists(filePath))
-        //     {
-        //         File.Delete(filePath);
-        //         _productFileInfos?.Remove(fileInfo);
-        //     }
+            //     // $"/images/products/{_model.Id}/{fileInfo.Name}
+            //     var filePath = Path.Combine(_dir, _model.Id.ToString()!, fileInfo.Name);
+            //     if (File.Exists(filePath))
+            //     {
+            //         File.Delete(filePath);
+            //         _productFileInfos?.Remove(fileInfo);
+            //     }
         }
     }
 }

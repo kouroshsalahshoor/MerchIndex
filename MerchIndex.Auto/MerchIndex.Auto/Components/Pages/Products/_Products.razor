@@ -84,7 +84,7 @@
     private ApplicationDbContext _db => Service;
 
     // private IQueryable<Product> query = default!;
-    private List<Product> _items = new();
+    private List<Product> _items { get; set; } = new();
 
     private bool _loading;
 

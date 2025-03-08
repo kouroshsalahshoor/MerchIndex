@@ -1,6 +1,9 @@
 ﻿@page "/admin/products"
 @page "/admin"
+
+@attribute [Authorize(Roles = Constants.Role_Admins + ", " + Constants.Role_CompanyAdmins)]
 @rendermode InteractiveServer
+@attribute [StreamRendering]
 
 <PageTitle>@_title</PageTitle>
 <h2 class="pb-2 border-bottom">@_title</h2>
@@ -15,9 +18,8 @@
     </div>
 </p>
 
-@* <QuickGrid Class="table table-striped table-hover" Items="_filteredItems" Pagination="_pagination"> *@
-@* <QuickGrid Class="table" Items="_query" Pagination="_pagination"> *@
-<QuickGrid Items="_query" Pagination="_pagination">
+<QuickGrid Class="table" Items="_query" Pagination="_pagination">
+    <PropertyColumn Property="x => x.Id" Sortable="true" />
     <PropertyColumn Property="x => x.Name" Sortable="true" />
     <PropertyColumn Property="x => x.Price" Sortable="true" />
     <PropertyColumn Property="x => x.Category" Sortable="true" />
@@ -34,7 +36,7 @@
     <TemplateColumn Context="item" Class="text-center zero_width">
         <HeaderTemplate><a class="btn btn-sm btn-primary mx-auto" href="admin/Product/create" title="Create"><i class="bi bi-plus-square"></i></a></HeaderTemplate>
         <ChildContent>
-            <a class="btn btn-sm btn-warning" href="@($"admin/Product/update/{item.Id}")" title="Update"><i class="bi bi-pencil-square"></i></a>
+            <a class="btn btn-sm btn-warning" href="@($"admin/company/{item.CompanyId}/Product/update/{item.Id}")" title="Update"><i class="bi bi-pencil-square"></i></a>
             <a class="btn btn-sm btn-info" href="@($"admin/Product/{item.Id}")" title="Details"><i class="bi bi-info-square"></i></a>
             <button class="btn btn-sm btn-danger" @onclick="@(async() => await delete(item))" title="Delete"><i class="bi bi-trash"></i></button>
         </ChildContent>
@@ -47,42 +49,45 @@
     private ApplicationDbContext _db => Service;
     private ClaimsPrincipal _currentUser = default!;
 
-    private string _title = "Products";
+    private string _title = "Produkter";
 
     private string _filter = string.Empty;
-    private IQueryable<Product> _query = default!;
+    private IQueryable<Product>? _query;
     private PaginationState _pagination = new PaginationState { ItemsPerPage = 100 };
 
     protected override async void OnInitialized()
     {
         _currentUser = (await _authenticationStateProvider!.GetAuthenticationStateAsync()).User;
 
+        if (_currentUser.IsInRole(Constants.Role_CompanyAdmins))
+        {
+            _title += $" för företag {_currentUser.Identity?.Name}";
+        }
         await load();
     }
 
     private async Task load()
     {
-        var query = _db.Products.Include(x=>x.Company)
-        .Where(x => 
-            string.IsNullOrEmpty(_filter) ||
-            string.IsNullOrEmpty(x.Name) || x.Name!.ToLower().Contains(_filter.ToLower()) ||
-            x.Price.ToString()!.ToLower().Contains(_filter.ToLower()) ||
-            string.IsNullOrEmpty(x.Category) || x.Category!.ToLower().Contains(_filter.ToLower()) ||
-            string.IsNullOrEmpty(x.Tag) || x.Tag!.ToLower().Contains(_filter.ToLower()) ||
-            string.IsNullOrEmpty(x.Company.Name) || x.Company.Name!.ToLower().Contains(_filter.ToLower())
-        ).OrderByDescending(x => x.Id).AsQueryable();
-        // _filteredItems = _db.Products.Where(m => m.Name!.Contains(_filter)).OrderByDescending(x => x.Id);
+        _query = _db.Products.Include(x => x.Company).AsQueryable();
 
         if (_currentUser.IsInRole(Constants.Role_CompanyAdmins))
         {
             var company = await _db.Companies.SingleOrDefaultAsync(x => x.Email == _currentUser.Identity!.Name);
             if (company != null)
             {
-                query = query.Where(x => x.CompanyId == company.Id).AsQueryable();
+                _query = _query.Where(x => x.CompanyId == company.Id).AsQueryable();
             }
         }
 
-        _query = query;
+        _query = _query.Where(x =>
+            string.IsNullOrEmpty(_filter) ||
+            string.IsNullOrEmpty(x.Name) || x.Name!.ToLower().Contains(_filter.ToLower()) ||
+            x.Price.ToString()!.ToLower().Contains(_filter.ToLower()) ||
+            string.IsNullOrEmpty(x.Category) || x.Category!.ToLower().Contains(_filter.ToLower()) ||
+            string.IsNullOrEmpty(x.Tag) || x.Tag!.ToLower().Contains(_filter.ToLower()) ||
+            string.IsNullOrEmpty(x.Company.Name) || x.Company.Name!.ToLower().Contains(_filter.ToLower())
+        ).AsQueryable();
+        // ).OrderByDescending(x => x.Id).AsQueryable();
     }
 
     private async Task delete(Product model)

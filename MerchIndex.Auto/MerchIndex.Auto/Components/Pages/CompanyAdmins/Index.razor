@@ -1,5 +1,11 @@
 ﻿@page "/companyadmins"
 
+@attribute [Authorize(Roles = Constants.Role_CompanyAdmins)]
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+<PageTitle>@_title</PageTitle>
+
 <style>
     /* feature.css */
      .feature-icon {
@@ -39,7 +45,7 @@
 </style>
 
 <div class="container px-4 py-5" id="featured-3">
-    <h2 class="pb-2 border-bottom">Company Admin Dashboard</h2>
+    <h2 class="pb-2 border-bottom">@_title</h2>
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
 
         <div class="feature col">
@@ -147,5 +153,5 @@
 </div>
 
 @code {
-
+    private string _title = "Company Admin Dashboard";
 }
