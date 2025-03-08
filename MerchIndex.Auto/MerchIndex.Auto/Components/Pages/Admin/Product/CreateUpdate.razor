@@ -86,7 +86,7 @@
     private Product _model { get; set; } = new();
 
     private bool _loading;
-    private string _dirName = "Companies";
+    private string _dirName = "Products";
     // private string _dir = string.Empty;
     private List<IBrowserFile>? _uploadingFiles;
     private List<FileInfo>? _fileInfos = new();
@@ -116,8 +116,23 @@
         }
         else
         {
-            _model = _db.Products.FirstOrDefault(p => p.Id == Id) ?? new();
+            var model = await _db.Products.FirstOrDefaultAsync(x => x.Id == Id);
+            if (model == null)
+            {
+                await _js.ToastrError("Couldn't find an item with this Id!!!");
+                return;
+            }
+            _model = model;
             _fileInfos = _imageService.GetFileInfos(_dirName, Id.ToString());
+
+            if (_model.CompanyId == 0)
+            {
+                var company = await _db.Companies.FirstOrDefaultAsync(c => c.Email == _currentUser.Identity!.Name);
+                if (company is not null)
+                {
+                    _model.CompanyId = company.Id;
+                }
+            }
         }
     }
 
