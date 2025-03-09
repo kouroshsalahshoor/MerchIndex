@@ -14,6 +14,10 @@
 
         public const string SaveSuccess = "Spara data lyckades.";
         public const string MessageSuccess = "Meddelande shickat.";
+
+        public const string SearchType_Companies = "Companies";
+        public const string SearchType_Products = "Products";
+        public const string SearchType_Services = "Services";
         
     }
 }
