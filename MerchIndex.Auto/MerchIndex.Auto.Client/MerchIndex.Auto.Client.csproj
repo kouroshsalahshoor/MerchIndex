@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Content Remove="Pages\Demos\Location\_Location.razor" />
-    <Content Remove="Pages\Home.razor" />
   </ItemGroup>
 
   <ItemGroup>

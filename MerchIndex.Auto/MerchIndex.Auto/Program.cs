@@ -121,7 +121,8 @@ builder.Services.AddHttpClient("RemoteAPIClient", cfg =>
        builder.Configuration["RemoteAPIBaseAddress"] ??
            throw new Exception("RemoteAPIBaseAddress is missing."));
 });
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7228/api/") });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["LocalAPIBaseAddress"] ??
+//throw new Exception("LocalAPIBaseAddress is missing.")) });
 //builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IStoreRepository, EFStoreRepository>();
