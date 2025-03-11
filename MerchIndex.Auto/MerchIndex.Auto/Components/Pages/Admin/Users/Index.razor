@@ -1,7 +1,7 @@
 ﻿@page "/admin/users"
 @rendermode InteractiveServer
 @attribute [StreamRendering]
-@attribute [Authorize]
+@attribute [Authorize(Roles = Constants.Role_Admins)]
 
 <PageTitle>@_title</PageTitle>
 

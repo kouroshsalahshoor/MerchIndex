@@ -50,28 +50,42 @@
                 <li class="nav-item">
                     <NavLink class="nav-link" href="services"><i class="bi bi-truck"></i> Service</NavLink>
                 </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="contact"><i class="bi bi-headset"></i> Kontakt</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="about"><i class="bi bi-info-circle"></i> Om oss</NavLink>
+                </li>
 
                 @* common *@
                 <AuthorizeView>
                     <Authorized>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Produkter
+                                <i class="bi bi-wrench"></i> Admin
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="admin/products"><i class="bi bi-boxes"></i> Produkter</a></li>
+                                <li><a class="dropdown-item" href="admin/services"><i class="bi bi-truck"></i> Service</a></li>
+                                <li><a class="dropdown-item" href="admin/companies"><i class="bi bi-building"></i> Companies</a></li>
                                 @* <li><a class="dropdown-item" href="admin/orders"><i class="bi bi-box2-heart"></i> Orders</a></li> *@
                                 @if (_currentUser.IsInRole(Constants.Role_Admins))
                                 {
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="admin/categories">Categories</a></li>
+                                    <li><a class="dropdown-item" href="admin/subscriptions"><i class="bi bi-send"></i> Prenumerationer</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="admin/categories"><i class="bi bi-bookmark"></i> Categories</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="admin/users"><i class="bi bi-person"></i> Users</a></li>
+                                    <li><a class="dropdown-item" href="admin/roles"><i class="bi bi-people"></i> Roles</a></li>
+
                                 }
                             </ul>
                         </li>
                     </Authorized>
                 </AuthorizeView>
 
-                <AuthorizeView Roles="@Constants.Role_Admins">
+                @* <AuthorizeView Roles="@Constants.Role_Admins">
                     <Authorized>
                         <li class="nav-item">
                             <NavLink class="nav-link" href="admin/companies">
@@ -98,20 +112,15 @@
                             </ul>
                         </li>
 
-                        @* <li class="nav-item">
+                        <li class="nav-item">
                             <NavLink class="nav-link" href="auth">
                                 <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
                             </NavLink>
-                        </li> *@
+                        </li>
                     </Authorized>
                 </AuthorizeView>
+ *@
 
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="contact"><i class="bi bi-headset"></i> Kontakt</NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="about"><i class="bi bi-info-circle"></i> Om oss</NavLink>
-                </li>
             </ul>
 
 

@@ -28,6 +28,7 @@ builder.Services.AddKeyedScoped<HttpClient>("RemoteAPIClientFromWASM",
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["LocalAPIBaseAddress"] ??
                 throw new Exception("LocalAPIBaseAddress is missing.")) });
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://merchindex.azurewebsites.net/api/") });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddSingleton<LocalStorageService>();
 

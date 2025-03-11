@@ -14,14 +14,30 @@
                     @* <input class="form-control" id="InputSearch" placeholder="" @bind-value="@_searchTerm" @oninput="setSearchTerm"> *@
                     <label for="InputSearch" class="form-label">Sök Text ....</label>
                 </div>
-                <button class="btn btn-warning text-light" @onclick="search" title="Sök" style="font-size: 28px;">
-                @* <button class="btn btn-warning text-light" @onclick="search" title="Sök" style="font-size: 28px;"
-                        data-bs-dismiss="offcanvas"> *@
+                <button class="btn btn-warning text-light" @onclick="search" title="Sök" style="font-size: 28px;"
+                        data-bs-dismiss="offcanvas">
                     <i class="bi bi-search"></i>
                 </button>
                 <button class="btn btn-light text-danger" @onclick="@reset" title="Reset" style="font-size: 28px;"><i class="bi bi-x"></i></button>
             </div>
         </div>
+
+        @if (IsInPage == false || PageName == "home")
+        {
+            <div class="mb-1">
+                <div class="form-floating">
+                    <InputSelect ValueExpression="@(()=>_selectedSearchType)"
+                                 Value="@_selectedSearchType"
+                                 ValueChanged="@((string value) => searchTypeSelected(value))"
+                                 class="form-select" id="SelectSearchType">
+                        <option value="@Constants.SearchType_Companies">Företag</option>
+                        <option value="@Constants.SearchType_Products">Produkt</option>
+                        <option value="@Constants.SearchType_Services">Service</option>
+                    </InputSelect>
+                    <label for="SelectCity">Välj en Söktyp</label>
+                </div>
+            </div>
+        }
 
         <div class="mb-1">
             <div class="form-floating">
@@ -62,93 +78,100 @@
                 <label for="SelectCity">Välj en Ort</label>
             </div>
         </div>
-        <div class="mb-1">
-            <div class="form-floating">
-                <InputSelect ValueExpression="@(()=>_selectedCompany)"
-                             Value="@_selectedCompany"
-                             ValueChanged="@((string value) => companySelected(value))"
-                             class="form-select" id="SelectCompany"
-                             disabled="@_companyDisabled">
-                    <option value="">Alla</option>
+        @if (PageName == "home")
+        {
 
-                    @foreach (var item in _companies ?? new())
-                    {
-                        if (string.IsNullOrEmpty(item) == false)
-                        {
-                            <option value="@item">@item</option>
-                        }
-                    }
-                </InputSelect>
-                <label for="SelectCity">Välj ett Företag</label>
-            </div>
-        </div>
-        <div class="mb-1">
-            <div class="form-floating">
-                <InputSelect ValueExpression="@(()=>_selectedCategory)"
-                             Value="@_selectedCategory"
-                             ValueChanged="@((string value) => categorySelected(value))"
-                             class="form-select" id="SelectCategory"
-                             disabled="@_categoryDisabled">
-                    <option value="">Alla</option>
+        }
+        else
+        {
+            <div class="mb-1">
+                <div class="form-floating">
+                    <InputSelect ValueExpression="@(()=>_selectedCompany)"
+                                 Value="@_selectedCompany"
+                                 ValueChanged="@((string value) => companySelected(value))"
+                                 class="form-select" id="SelectCompany"
+                                 disabled="@_companyDisabled">
+                        <option value="">Alla</option>
 
-                    @foreach (var item in _categories ?? new())
-                    {
-                        if (string.IsNullOrEmpty(item) == false)
+                        @foreach (var item in _companies ?? new())
                         {
-                            <option value="@item">@item</option>
+                            if (string.IsNullOrEmpty(item) == false)
+                            {
+                                <option value="@item">@item</option>
+                            }
                         }
-                    }
-                </InputSelect>
-                <label for="SelectCategory">Välj en Kategorier</label>
+                    </InputSelect>
+                    <label for="SelectCity">Välj ett Företag</label>
+                </div>
             </div>
-        </div>
-        <div class="mb-1">
-            <div class="form-floating">
-                <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
-                             Value="@_selectedManifacturer"
-                             ValueChanged="@((string value) => manifacturerSelected(value))"
-                             class="form-select" id="SelectManifacturer"
-                             disabled="@_manifacturerDisabled">
-                    <option value="">Alla</option>
+            <div class="mb-1">
+                <div class="form-floating">
+                    <InputSelect ValueExpression="@(()=>_selectedCategory)"
+                                 Value="@_selectedCategory"
+                                 ValueChanged="@((string value) => categorySelected(value))"
+                                 class="form-select" id="SelectCategory"
+                                 disabled="@_categoryDisabled">
+                        <option value="">Alla</option>
 
-                    @foreach (var item in _manifacturers ?? new())
-                    {
-                        if (string.IsNullOrEmpty(item) == false)
+                        @foreach (var item in _categories ?? new())
                         {
-                            <option value="@item">@item</option>
+                            if (string.IsNullOrEmpty(item) == false)
+                            {
+                                <option value="@item">@item</option>
+                            }
                         }
-                    }
-                </InputSelect>
-                <label for="SelectManifacturer">Välj en Tillverkare</label>
+                    </InputSelect>
+                    <label for="SelectCategory">Välj en Kategorier</label>
+                </div>
             </div>
-        </div>
-        <div class="mb-1">
-            <div class="form-floating">
-                <InputSelect ValueExpression="@(()=>_selectedSortBy)"
-                             Value="@_selectedSortBy"
-                             ValueChanged="@((string value) => sortBySelected(value))"
-                             class="form-select" id="SelectSort">
-                    @* <option value="" selected>Id</option> *@
-                    <option value="name" selected>Namn</option>
-                    <option value="price">Pris</option>
-                    <option value="category">Kategori</option>
-                    <option value="manifacturer">Tillverkare</option>
-                </InputSelect>
-                <label for="SelectSort">Sortera Efter</label>
+            <div class="mb-1">
+                <div class="form-floating">
+                    <InputSelect ValueExpression="@(()=>_selectedManifacturer)"
+                                 Value="@_selectedManifacturer"
+                                 ValueChanged="@((string value) => manifacturerSelected(value))"
+                                 class="form-select" id="SelectManifacturer"
+                                 disabled="@_manifacturerDisabled">
+                        <option value="">Alla</option>
+
+                        @foreach (var item in _manifacturers ?? new())
+                        {
+                            if (string.IsNullOrEmpty(item) == false)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </InputSelect>
+                    <label for="SelectManifacturer">Välj en Tillverkare</label>
+                </div>
             </div>
-        </div>
-        <div class="mb-1">
-            <div class="form-floating">
-                <InputSelect ValueExpression="@(()=>_selectedOrder)"
-                             Value="@_selectedOrder"
-                             ValueChanged="@((string value) => orderBySelected(value))"
-                             class="form-select" id="SelectOrder">
-                    <option value="" selected>Uppstigande</option>
-                    <option value="desc">Nedåtgående</option>
-                </InputSelect>
-                <label for="SelectOrder">Ordning</label>
+            <div class="mb-1">
+                <div class="form-floating">
+                    <InputSelect ValueExpression="@(()=>_selectedSortBy)"
+                                 Value="@_selectedSortBy"
+                                 ValueChanged="@((string value) => sortBySelected(value))"
+                                 class="form-select" id="SelectSort">
+                        @* <option value="" selected>Id</option> *@
+                        <option value="name" selected>Namn</option>
+                        <option value="price">Pris</option>
+                        <option value="category">Kategori</option>
+                        <option value="manifacturer">Tillverkare</option>
+                    </InputSelect>
+                    <label for="SelectSort">Sortera Efter</label>
+                </div>
             </div>
-        </div>
+            <div class="mb-1">
+                <div class="form-floating">
+                    <InputSelect ValueExpression="@(()=>_selectedOrder)"
+                                 Value="@_selectedOrder"
+                                 ValueChanged="@((string value) => orderBySelected(value))"
+                                 class="form-select" id="SelectOrder">
+                        <option value="" selected>Uppstigande</option>
+                        <option value="desc">Nedåtgående</option>
+                    </InputSelect>
+                    <label for="SelectOrder">Ordning</label>
+                </div>
+            </div>
+        }
 
     </div>
 
@@ -156,7 +179,8 @@
 
 @code {
     // [Parameter] public string? SearchTerm { get; set; }
-    [Parameter] public bool IsInPage { get; set; } 
+    [Parameter] public bool IsInPage { get; set; }
+    [Parameter] public string PageName { get; set; } = string.Empty;
     [Parameter] public EventCallback<SearchVm> OnSearch { get; set; }
 
     private ApplicationDbContext _db => Service;
@@ -188,6 +212,14 @@
 
     private string? _selectedSortBy;
     private string? _selectedOrder;
+
+    private string? _selectedSearchType;
+
+    private List<string> _businessAreas = new();
+    private string? _selectedBusinessArea;
+
+    private List<string> _tags = new();
+    private string? _selectedTag;
 
     protected override async Task OnInitializedAsync()
     {
@@ -249,6 +281,11 @@
         _searchTerm = (string)e.Value!;
     }
 
+    private void searchTypeSelected(string val)
+    {
+        _selectedSearchType = val;
+    }
+
     private void reset()
     {
         _districts.Clear();
@@ -269,6 +306,8 @@
         _companyDisabled = true;
         _categoryDisabled = true;
         _manifacturerDisabled = true;
+
+        _selectedSearchType = Constants.SearchType_Companies;
     }
 
     private async Task search()

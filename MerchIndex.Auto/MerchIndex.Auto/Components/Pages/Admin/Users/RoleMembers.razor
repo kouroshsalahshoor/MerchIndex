@@ -1,6 +1,6 @@
 ﻿@page "/admin/role/{id}/members"
 
-@attribute [Authorize]
+@attribute [Authorize(Roles = Constants.Role_Admins)]
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 

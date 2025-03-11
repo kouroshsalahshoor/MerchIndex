@@ -14,7 +14,8 @@
             <input type="text" class="form-control" id="search" placeholder="" @bind="_filter" @bind:event="oninput">
             <label for="search">Search</label>
         </div>
-        <span class="input-group-text bg-warning text-light px-3"><i class="bi bi-search"></i></span>
+        <button class="btn btn-light text-danger border-dark-subtle px-3" title="reset" @onclick="reset"><i class="bi bi-x"></i></button>
+        <button class="btn btn-warning bg-warning text-light px-3" title="search"><i class="bi bi-search"></i></button>
     </div>
 </p>
 
@@ -24,7 +25,7 @@
     <PropertyColumn Property="x => x.Price" Sortable="true" />
     <PropertyColumn Property="x => x.Category" Sortable="true" />
     <PropertyColumn Property="x => x.Tag" Sortable="true" />
-    <PropertyColumn Property="x => x.Company.Name" Sortable="true" Title="Company Name" />
+    <PropertyColumn Property="x => x.Company!.Name" Sortable="true" Title="Company Name" />
 
     <TemplateColumn Context="item" Class="text-center zero_width">
         <HeaderTemplate><strong>Image</strong></HeaderTemplate>
@@ -68,26 +69,29 @@
 
     private async Task load()
     {
-        _query = _db.Products.Include(x => x.Company).AsQueryable();
+        var query = _db.Products.Include(x => x.Company).AsQueryable();
 
         if (_currentUser.IsInRole(Constants.Role_CompanyAdmins))
         {
             var company = await _db.Companies.SingleOrDefaultAsync(x => x.Email == _currentUser.Identity!.Name);
             if (company != null)
             {
-                _query = _query.Where(x => x.CompanyId == company.Id).AsQueryable();
+                query = query.Where(x => x.CompanyId == company.Id).AsQueryable();
             }
         }
 
-        _query = _query.Where(x =>
+        query = query.Where(x =>
             string.IsNullOrEmpty(_filter) ||
             string.IsNullOrEmpty(x.Name) || x.Name!.ToLower().Contains(_filter.ToLower()) ||
             x.Price.ToString()!.ToLower().Contains(_filter.ToLower()) ||
             string.IsNullOrEmpty(x.Category) || x.Category!.ToLower().Contains(_filter.ToLower()) ||
             string.IsNullOrEmpty(x.Tag) || x.Tag!.ToLower().Contains(_filter.ToLower()) ||
-            string.IsNullOrEmpty(x.Company.Name) || x.Company.Name!.ToLower().Contains(_filter.ToLower())
+            string.IsNullOrEmpty(x.Company!.Name) || x.Company.Name!.ToLower().Contains(_filter.ToLower())
         ).AsQueryable();
         // ).OrderByDescending(x => x.Id).AsQueryable();
+
+        _query = query;
+        StateHasChanged();
     }
 
     private async Task delete(Product model)
@@ -106,47 +110,9 @@
         }
     }
 
-    // private string _dir = string.Empty;
-
-    // protected async override Task OnInitializedAsync()
-    // {
-    //     base.OnInitialized();
-
-    //     // var user = (await _authStat!).User;
-    //     // if (!user.Identity!.IsAuthenticated)
-    //     // {
-    //     //     _navigationManager.NavigateTo($"login?returnUrl={Uri.EscapeDataString(_navigationManager.Uri)}");
-    //     // }
-
-    //     _dir = Path.Combine(_env.WebRootPath, "images", "products");
-    //     await load();
-    // }
-    // private async Task load()
-    // {
-    //     _items = await _db.Products.ToListAsync();
-    // }
-    // private async Task delete(Product p)
-    // {
-    //     if (await _js.InvokeAsync<bool>("confirm", Constants.DeleteText))
-    //     {
-    //         _db.Products.Remove(p);
-    //         await _db.SaveChangesAsync();
-    //         await load();
-    //     }
-    // }
-
-    // private string? getImageUrl(long? id)
-    // {
-    //     var productDir = Path.Combine(_dir, id.ToString()!);
-    //     if (Directory.Exists(productDir))
-    //     {
-    //         var files = Directory.GetFiles(productDir);
-    //         if (files is not null && files.FirstOrDefault() is not null)
-    //         {
-    //             var fileName = new FileInfo(files.FirstOrDefault()!).Name;
-    //             return $"images/products/{id.ToString()}/{fileName}";
-    //         }
-    //     }
-    //     return $"images/default.png";
-    // }
+    private async Task reset()
+    {
+        _filter = string.Empty;
+        await load();
+    }
 }
